@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Wings Convent · Complete ERP System · Professional Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg-body: #f0f4f9;
+            --bg-surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-light: #e2e8f0;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --card-radius: 24px;
+            --safe-area: env(safe-area-inset-bottom);
+            --theme-primary: #2563eb;
+            --theme-secondary: #7c3aed;
+        }
+        .theme-blue { --theme-primary: #2563eb; --theme-secondary: #7c3aed; }
+        .theme-green { --theme-primary: #10b981; --theme-secondary: #059669; }
+        .theme-purple { --theme-primary: #8b5cf6; --theme-secondary: #6d28d9; }
+        .theme-orange { --theme-primary: #f97316; --theme-secondary: #ea580c; }
+        .theme-dark { --theme-primary: #6b7280; --theme-secondary: #4b5563; --bg-body: #0f172a; --bg-surface: #1e293b; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --border-light: #334155; --primary-light: #1e3a8a; }
+        .dark-mode { --bg-body: #0f172a; --bg-surface: #1e293b; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --border-light: #334155; --primary-light: #1e3a8a; }
+        body { background: var(--bg-body); color: var(--text-primary); transition: all 0.3s ease; min-height: 100vh; overflow-x: hidden; }
+        #app { width: 100%; max-width: 100%; margin: 0; background: var(--bg-body); min-height: 100vh; padding-bottom: 80px; }
+        .screen { display: none; width: 100%; min-height: 100vh; }
+        .screen.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .loader { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--bg-surface); border-top-color: var(--theme-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Header */
+        .app-header { background: var(--bg-surface); padding: 14px 20px; padding-top: max(14px, env(safe-area-inset-top)); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(12px); background: rgba(var(--bg-surface-rgb, 255,255,255), 0.92); box-shadow: var(--shadow-sm); }
+        .logo-container span { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .date-time { background: var(--bg-body); padding: 8px 14px; border-radius: 40px; border: 1px solid var(--border-light); font-size: 12px; font-weight: 500; }
+        .user-profile { display: flex; align-items: center; gap: 8px; background: var(--bg-body); padding: 6px 12px 6px 8px; border-radius: 40px; border: 1px solid var(--border-light); cursor: pointer; transition: all 0.2s; }
+        .user-profile:active { background: var(--primary-light); }
+        .theme-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-body); border: 1px solid var(--border-light); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        
+        /* FAB Menu */
+        .fab { position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 28px; background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--shadow-lg); cursor: pointer; z-index: 90; border: none; transition: transform 0.2s; }
+        .fab:active { transform: scale(0.92); }
+        .fab-menu { position: fixed; bottom: 150px; right: 20px; display: none; flex-direction: column; gap: 12px; z-index: 89; }
+        .fab-menu.show { display: flex; animation: slideUp 0.2s ease; }
+        .fab-item { width: 48px; height: 48px; border-radius: 24px; background: var(--bg-surface); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; box-shadow: var(--shadow-md); color: var(--text-primary); transition: all 0.2s; }
+        .fab-item:active { transform: scale(0.92); background: var(--primary-light); }
+        
+        /* Notification */
+        .notification-icon-container { position: relative; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; background: var(--bg-body); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 9px; font-weight: 600; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-surface); }
+        .notification-popup { position: fixed; top: 70px; right: 10px; left: 10px; max-width: 380px; margin: 0 auto; background: var(--bg-surface); border-radius: 24px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-light); z-index: 1000; display: none; overflow: hidden; }
+        .notification-popup.show { display: block; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Modules Grid */
+        .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; padding: 16px; }
+        .module-card { background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: 20px; padding: 16px 8px; text-align: center; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
+        .module-card:active { transform: scale(0.96); background: var(--primary-light); border-color: var(--theme-primary); }
+        .module-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+        .module-title { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .module-badge { font-size: 9px; color: var(--text-secondary); }
+        
+        /* Module Header */
+        .module-header { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border-light); position: sticky; top: 60px; z-index: 90; }
+        .back-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--bg-body); border: 1px solid var(--border-light); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .back-btn:active { transform: scale(0.92); background: var(--primary-light); }
+        .content { padding: 16px; animation: fadeIn 0.3s ease; }
+        
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-surface); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; padding: 10px 16px; padding-bottom: max(10px, env(safe-area-inset-bottom)); z-index: 100; backdrop-filter: blur(12px); background: rgba(var(--bg-surface-rgb, 255,255,255), 0.95); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 6px 12px; border-radius: 30px; font-size: 11px; transition: all 0.2s; }
+        .nav-item span:first-child { font-size: 22px; }
+        .nav-item.active { color: var(--theme-primary); background: var(--primary-light); }
+        
+        /* Cards */
+        .cards-container { display: flex; flex-direction: column; gap: 16px; padding: 8px 0; }
+        .data-card { background: var(--bg-surface); border-radius: var(--card-radius); border: 1px solid var(--border-light); overflow: hidden; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
+        .data-card:active { transform: scale(0.99); box-shadow: var(--shadow-md); }
+        .card-header { display: flex; align-items: center; gap: 16px; padding: 16px; border-bottom: 1px solid var(--border-light); background: linear-gradient(135deg, var(--bg-surface), var(--bg-body)); }
+        .card-photo { width: 56px; height: 56px; border-radius: 28px; background: linear-gradient(135deg, var(--primary-light), var(--theme-secondary)); display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid var(--theme-primary); flex-shrink: 0; overflow: hidden; }
+        .card-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .card-title { flex: 1; }
+        .card-title h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .card-title p { font-size: 12px; color: var(--text-secondary); }
+        .badge { padding: 4px 12px; border-radius: 30px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fed7aa; color: #9b2c1d; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 16px; }
+        .info-item { display: flex; flex-direction: column; gap: 4px; }
+        .info-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .info-value { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .card-actions { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border-light); background: var(--bg-body); flex-wrap: wrap; }
+        .action-chip { background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: 30px; padding: 8px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .action-chip:active { background: var(--primary-light); transform: scale(0.96); }
+        .progress-container { width: 100%; height: 6px; background: var(--border-light); border-radius: 3px; margin: 12px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary)); border-radius: 3px; transition: width 0.5s ease; }
+        
+        /* Summary Cards */
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin: 16px 0; }
+        .summary-item { background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); border-radius: 24px; padding: 20px 16px; color: white; position: relative; overflow: hidden; transition: transform 0.2s; }
+        .summary-item:active { transform: scale(0.98); }
+        .summary-value { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+        .summary-item div:last-child { font-size: 12px; opacity: 0.9; font-weight: 500; }
+        
+        /* Charts */
+        .chart-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .chart-card { background: var(--bg-surface); border-radius: 24px; padding: 20px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+        .chart-card h3 { font-size: 15px; margin-bottom: 16px; color: var(--theme-primary); font-weight: 600; }
+        canvas { max-height: 200px; width: 100% !important; height: auto !important; }
+        
+        /* Weather Widget */
+        .weather-widget { background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 24px; padding: 20px; color: white; margin: 16px 0; display: flex; align-items: center; justify-content: space-between; }
+        .weather-temp { font-size: 36px; font-weight: 700; }
+        
+        /* Professional Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--bg-surface); border-radius: 32px; padding: 28px; max-width: 90%; width: 100%; max-width: 600px; max-height: 85vh; overflow-y: auto; animation: modalZoomIn 0.3s ease-out; border: 1px solid var(--border-light); box-shadow: var(--shadow-lg); }
+        @keyframes modalZoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--theme-primary); }
+        .modal-header h2 { font-size: 22px; color: var(--theme-primary); display: flex; align-items: center; gap: 12px; font-weight: 700; }
+        .close-btn { background: var(--bg-body); border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .close-btn:active { background: var(--primary-light); transform: scale(0.92); }
+        
+        /* Forms */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-control { width: 100%; padding: 14px 16px; border: 2px solid var(--border-light); border-radius: 16px; background: var(--bg-surface); color: var(--text-primary); font-size: 14px; transition: all 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--theme-primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .upload-area { border: 2px dashed var(--border-light); border-radius: 20px; padding: 24px; text-align: center; cursor: pointer; background: var(--bg-body); margin-bottom: 16px; transition: all 0.2s; }
+        .upload-area:active { background: var(--primary-light); transform: scale(0.98); }
+        .upload-area i { font-size: 32px; color: var(--theme-primary); margin-bottom: 12px; display: block; }
+        .preview-img { max-width: 100%; max-height: 150px; border-radius: 16px; margin-top: 12px; object-fit: cover; }
+        .file-preview { background: var(--bg-body); border-radius: 16px; padding: 12px; margin-top: 12px; display: flex; align-items: center; gap: 12px; font-size: 13px; }
+        .modal-actions { display: flex; gap: 16px; margin-top: 28px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 40px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-info { background: var(--info); color: white; }
+        .btn-sm { padding: 10px 20px; font-size: 12px; flex: none; }
+        
+        /* Filter Chips */
+        .filter-group { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+        .filter-chip { background: var(--bg-body); border: 1px solid var(--border-light); border-radius: 40px; padding: 8px 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .filter-chip.active { background: var(--theme-primary); color: white; border-color: var(--theme-primary); }
+        .search-box { flex: 1; padding: 12px 20px; border: 2px solid var(--border-light); border-radius: 40px; background: var(--bg-surface); color: var(--text-primary); font-size: 14px; }
+        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+        
+        /* Receipt Styles */
+        .receipt-preview { background: linear-gradient(135deg, #fef9e6, #fff); border-radius: 20px; padding: 24px; border: 1px solid #e2e8f0; }
+        .receipt-header { text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 16px; margin-bottom: 16px; }
+        .receipt-title { font-size: 20px; font-weight: 800; color: #1e293b; }
+        .receipt-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .receipt-footer { text-align: center; margin-top: 20px; padding-top: 16px; border-top: 2px dashed #ccc; font-size: 11px; }
+        
+        /* Timetable & Classes */
+        .timetable-grid { display: grid; gap: 16px; }
+        .timetable-day { background: var(--bg-surface); border-radius: 20px; padding: 16px; border: 1px solid var(--border-light); }
+        .period { padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; display: flex; justify-content: space-between; }
+        .class-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .class-card { background: var(--bg-surface); border-radius: 20px; padding: 20px; border: 1px solid var(--border-light); }
+        .setting-card { background: var(--bg-surface); border-radius: 20px; padding: 18px 20px; border: 1px solid var(--border-light); cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; transition: all 0.2s; }
+        .setting-card:active { transform: scale(0.98); background: var(--primary-light); }
+        .profile-card { padding: 24px; background: var(--bg-surface); border-radius: 28px; border: 1px solid var(--border-light); margin-bottom: 16px; }
+        .history-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border-light); font-size: 13px; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .toast-container { position: fixed; top: 80px; left: 16px; right: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--bg-surface); color: var(--text-primary); padding: 14px 20px; border-radius: 50px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s; border-left: 4px solid var(--theme-primary); pointer-events: auto; font-size: 13px; font-weight: 500; }
+        
+        @media (max-width: 480px) { .modules-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } .summary-cards { grid-template-columns: repeat(2, 1fr); } .date-time { display: none; } .modal-content { max-width: 95%; padding: 20px; } }
+        @media (min-width: 768px) { .modules-grid { grid-template-columns: repeat(5, 1fr); } .chart-container { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body class="theme-blue">
+<div id="app">
+    <div id="loader" class="loader" style="display: none;"><div class="spinner"></div></div>
+    
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; background: linear-gradient(135deg, var(--primary-light), var(--bg-body));">
+            <div style="background:var(--bg-surface); border-radius:40px; padding:32px; width:100%; max-width:420px; box-shadow:var(--shadow-lg);">
+                <div style="text-align:center; margin-bottom:32px;">
+                    <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); border-radius:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;"><i class="fas fa-school" style="font-size:36px; color:white;"></i></div>
+                    <h2 style="font-size:28px; background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Wings Convent</h2>
+                    <p style="color:var(--text-secondary); font-size:13px;">Complete ERP System | Professional Edition</p>
+                </div>
+                <div style="position:relative; margin-bottom:16px;"><i class="fas fa-user" style="position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--text-secondary);"></i><input type="text" id="username" placeholder="Username" value="admin" style="width:100%; padding:14px 14px 14px 48px; border:2px solid var(--border-light); border-radius:50px; background:var(--bg-body);"></div>
+                <div style="position:relative; margin-bottom:16px;"><i class="fas fa-lock" style="position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--text-secondary);"></i><input type="password" id="password" placeholder="Password" value="1234" style="width:100%; padding:14px 14px 14px 48px; border:2px solid var(--border-light); border-radius:50px; background:var(--bg-body);"></div>
+                <div style="position:relative; margin-bottom:24px;"><i class="fas fa-user-tag" style="position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--text-secondary);"></i><select id="userRole" style="width:100%; padding:14px 14px 14px 48px; border:2px solid var(--border-light); border-radius:50px; background:var(--bg-body);"><option value="admin">👑 Administrator (Full Access)</option><option value="teacher">👩‍🏫 Teacher</option><option value="student">🧑‍🎓 Student</option><option value="cashier">💰 Cashier</option><option value="accountant">📊 Accountant</option></select></div>
+                <button class="btn btn-primary" id="loginBtn" style="width:100%; padding:14px;"><i class="fas fa-lock-open"></i> Login to Dashboard</button>
+                <div style="margin-top:20px; padding:12px; background:var(--bg-body); border-radius:24px; text-align:center; font-size:11px;"><i class="fas fa-info-circle"></i> Demo Password: 1234 | All Modules Active</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Screen -->
+    <div id="mainScreen" class="screen">
+        <div class="app-header">
+            <div class="logo-container"><span><i class="fas fa-school"></i> Wings Convent ERP</span></div>
+            <div class="header-right"><div class="date-time" id="headerDateTime"></div><div class="notification-icon-container" id="notificationIcon"><i class="far fa-bell"></i><span class="notification-badge" id="notificationBadge">3</span></div><div class="user-profile" id="userProfile"><i class="far fa-user-circle"></i><span id="headerUserName">Admin</span></div><button class="theme-btn" id="themeToggle">🌙</button></div>
+        </div>
+        <div id="dashboardView"><div class="modules-grid" id="moduleGrid"></div></div>
+        <div id="moduleView" class="module-view" style="display: none;"><div class="module-header"><button class="back-btn" id="backToDashboardBtn"><i class="fas fa-arrow-left"></i></button><h2 id="moduleTitle" style="font-size:20px; font-weight:700;">Module</h2></div><div id="moduleContent" class="content"></div></div>
+        <button class="fab" id="fab" onclick="toggleFabMenu()"><i class="fas fa-plus"></i></button>
+        <div class="fab-menu" id="fabMenu">
+            <button class="fab-item" onclick="showAddStudentForm()" title="Add Student"><i class="fas fa-user-plus"></i></button>
+            <button class="fab-item" onclick="showAddEmployeeForm()" title="Add Employee"><i class="fas fa-user-tie"></i></button>
+            <button class="fab-item" onclick="showAddHomeworkForm()" title="Add Homework"><i class="fas fa-book"></i></button>
+            <button class="fab-item" onclick="showCollectFeeForm()" title="Collect Fee"><i class="fas fa-rupee-sign"></i></button>
+            <button class="fab-item" onclick="showAddExpenseForm()" title="Add Expense"><i class="fas fa-wallet"></i></button>
+            <button class="fab-item" onclick="showAddEventForm()" title="Add Event"><i class="fas fa-calendar-plus"></i></button>
+            <button class="fab-item" onclick="showAddExamForm()" title="Add Exam"><i class="fas fa-pencil-alt"></i></button>
+            <button class="fab-item" onclick="showApplyLeaveForm()" title="Apply Leave"><i class="fas fa-umbrella-beach"></i></button>
+        </div>
+        <div class="bottom-nav">
+            <button class="nav-item active" data-nav="dashboard"><span>🏠</span><span>Home</span></button>
+            <button class="nav-item" data-nav="students"><span>🧑‍🎓</span><span>Students</span></button>
+            <button class="nav-item" data-nav="fees"><span>💰</span><span>Fees</span></button>
+            <button class="nav-item" data-nav="attendance"><span>📋</span><span>Attend</span></button>
+            <button class="nav-item" data-nav="profile"><span>👤</span><span>Profile</span></button>
+            <button class="nav-item" id="logoutNavBtn"><span>🚪</span><span>Exit</span></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======================= CONFIGURATION =======================
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9HE7UAnU_rRWoil03vEWWXswHS8wzNSfzMnEKwISZOfNUwUGszIly6r5W33ks9QP7XQ/exec';
+    
+    let currentUser = null, darkMode = false, toastContainer = null;
+    let loginHistory = [], charts = {};
+    
+    // ======================= COMPLETE SAMPLE DATA =======================
+    // Classes with Sections A & B
+    const classSections = [
+        { name: 'Playgroup', sections: ['A', 'B'] },
+        { name: 'Nursery', sections: ['A', 'B'] },
+        { name: 'KG-1', sections: ['A', 'B'] },
+        { name: 'KG-2', sections: ['A', 'B'] }
+    ];
+    
+    let students = [
+        { id: 'S001', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Aarav Sharma', cls: 'Playgroup', sec: 'A', roll: 1, gender: 'Male', fatherName: 'Rahul Sharma', motherName: 'Priya Sharma', fatherMobile: '9876543210', motherMobile: '9876543211', feeDue: 2500, attendance: 85, status: 'Active', bloodGroup: 'O+', religion: 'Hindu', category: 'General', dob: '2020-05-15', mobile: '9876543210', email: 'aarav@example.com', address: 'Delhi', admissionNo: 'ADM001', admissionDate: '2024-04-01' },
+        { id: 'S002', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Advik Mehta', cls: 'Playgroup', sec: 'A', roll: 2, gender: 'Male', fatherName: 'Raj Mehta', motherName: 'Neha Mehta', feeDue: 0, attendance: 92, status: 'Active', bloodGroup: 'A+', dob: '2020-06-20' },
+        { id: 'S003', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Ishita Verma', cls: 'Playgroup', sec: 'B', roll: 1, gender: 'Female', fatherName: 'Vikram Verma', motherName: 'Kavita Verma', feeDue: 1500, attendance: 88, status: 'Active', bloodGroup: 'B+', dob: '2020-07-15' },
+        { id: 'S004', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Vihaan Singh', cls: 'Nursery', sec: 'A', roll: 1, gender: 'Male', fatherName: 'Amar Singh', motherName: 'Rani Singh', feeDue: 1800, attendance: 78, status: 'Active', dob: '2019-03-10' },
+        { id: 'S005', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Anaya Kapoor', cls: 'Nursery', sec: 'A', roll: 2, gender: 'Female', fatherName: 'Rohit Kapoor', motherName: 'Simran Kapoor', feeDue: 0, attendance: 95, status: 'Active', dob: '2019-05-22' },
+        { id: 'S006', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Reyansh Nair', cls: 'Nursery', sec: 'B', roll: 1, gender: 'Male', fatherName: 'Suresh Nair', motherName: 'Lakshmi Nair', feeDue: 2000, attendance: 82, status: 'Active', dob: '2019-08-18' },
+        { id: 'S007', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Ananya Gupta', cls: 'KG-1', sec: 'A', roll: 1, gender: 'Female', fatherName: 'Raj Gupta', motherName: 'Neha Gupta', feeDue: 3500, attendance: 95, status: 'Active', dob: '2018-11-05' },
+        { id: 'S008', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Arjun Reddy', cls: 'KG-1', sec: 'A', roll: 2, gender: 'Male', fatherName: 'Krishna Reddy', motherName: 'Anita Reddy', feeDue: 1200, attendance: 88, status: 'Active', dob: '2018-09-12' },
+        { id: 'S009', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Diya Malhotra', cls: 'KG-1', sec: 'B', roll: 1, gender: 'Female', fatherName: 'Amit Malhotra', motherName: 'Priya Malhotra', feeDue: 0, attendance: 98, status: 'Active', dob: '2018-12-03' },
+        { id: 'S010', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Reyansh Kumar', cls: 'KG-2', sec: 'A', roll: 1, gender: 'Male', fatherName: 'Sanjay Kumar', motherName: 'Poonam Kumar', feeDue: 0, attendance: 88, status: 'Active', dob: '2017-07-19' },
+        { id: 'S011', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Sia Bhatia', cls: 'KG-2', sec: 'A', roll: 2, gender: 'Female', fatherName: 'Manoj Bhatia', motherName: 'Ritu Bhatia', feeDue: 500, attendance: 92, status: 'Active', dob: '2017-09-25' },
+        { id: 'S012', photoData: null, aadharData: null, birthData: null, tcData: null, otherDocs: [], name: 'Ayaan Khan', cls: 'KG-2', sec: 'B', roll: 1, gender: 'Male', fatherName: 'Imran Khan', motherName: 'Farah Khan', feeDue: 2800, attendance: 85, status: 'Active', dob: '2017-05-14' }
+    ];
+    
+    let employees = [
+        { id: 'E001', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Priya Sharma', department: 'Teaching', designation: 'Head Teacher', classTeacher: 'Playgroup A', mobile: '9876543220', email: 'priya@wings.edu', salary: 35000, status: 'Active', joiningDate: '2022-01-10', qualification: 'M.A., B.Ed', experience: '8 years' },
+        { id: 'E002', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Rajesh Kumar', department: 'Teaching', designation: 'Senior Teacher', classTeacher: 'Playgroup B', mobile: '9876543221', salary: 32000, status: 'Active' },
+        { id: 'E003', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Anjali Patel', department: 'Teaching', designation: 'Teacher', classTeacher: 'Nursery A', mobile: '9876543222', salary: 28000, status: 'Active' },
+        { id: 'E004', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Meena Gupta', department: 'Teaching', designation: 'Teacher', classTeacher: 'Nursery B', mobile: '9876543225', salary: 28000, status: 'Active' },
+        { id: 'E005', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Sunita Yadav', department: 'Teaching', designation: 'Teacher', classTeacher: 'KG-1 A', mobile: '9876543226', salary: 30000, status: 'Active' },
+        { id: 'E006', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Vikram Singh', department: 'Teaching', designation: 'Teacher', classTeacher: 'KG-1 B', mobile: '9876543227', salary: 30000, status: 'Active' },
+        { id: 'E007', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Rajesh Khanna', department: 'Teaching', designation: 'Teacher', classTeacher: 'KG-2 A', mobile: '9876543228', salary: 32000, status: 'Active' },
+        { id: 'E008', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Neha Sharma', department: 'Teaching', designation: 'Teacher', classTeacher: 'KG-2 B', mobile: '9876543229', salary: 32000, status: 'Active' },
+        { id: 'E009', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Suresh Kumar', department: 'Accounts', designation: 'Cashier', mobile: '9876543223', salary: 25000, status: 'Active' },
+        { id: 'E010', photoData: null, aadharData: null, panData: null, birthData: null, eduDocs: [], expDocs: [], name: 'Anita Sharma', department: 'Admin', designation: 'Accountant', mobile: '9876543224', salary: 35000, status: 'Active' }
+    ];
+    
+    let fees = [
+        { id: 'F001', receiptNo: 'REC001', studentName: 'Aarav Sharma', amount: 2500, date: '2026-03-23', mode: 'Cash', status: 'Paid', class: 'Playgroup A', discount: 0, fine: 0, feeType: 'Tuition Fee', transactionId: 'CASH001', paymentScreenshot: null, receiptFile: null },
+        { id: 'F002', receiptNo: 'REC002', studentName: 'Advik Mehta', amount: 2500, date: '2026-03-23', mode: 'Online', status: 'Paid', class: 'Playgroup A', discount: 0, fine: 0, feeType: 'Tuition Fee', transactionId: 'ONLINE123' },
+        { id: 'F003', receiptNo: 'REC003', studentName: 'Ishita Verma', amount: 1500, date: '2026-03-22', mode: 'Cheque', status: 'Pending', class: 'Playgroup B', discount: 0, fine: 100, feeType: 'Tuition Fee', transactionId: 'CHQ456' }
+    ];
+    
+    let attendance = [
+        { id: 'A001', date: new Date().toISOString().split('T')[0], studentName: 'Aarav Sharma', status: 'Present', class: 'Playgroup A', proofData: null },
+        { id: 'A002', date: new Date().toISOString().split('T')[0], studentName: 'Advik Mehta', status: 'Present', class: 'Playgroup A' },
+        { id: 'A003', date: new Date().toISOString().split('T')[0], studentName: 'Ishita Verma', status: 'Absent', class: 'Playgroup B' }
+    ];
+    
+    let empAttendance = [
+        { id: 'EA001', date: new Date().toISOString().split('T')[0], empName: 'Priya Sharma', status: 'Present', inTime: '09:00', outTime: '17:00', hours: 8, proofData: null },
+        { id: 'EA002', date: new Date().toISOString().split('T')[0], empName: 'Rajesh Kumar', status: 'Late', inTime: '09:45', outTime: '17:00', hours: 7.25 }
+    ];
+    
+    let homework = [
+        { id: 'H001', title: 'Write A to Z', subject: 'English', dueDate: '2026-03-28', status: 'Pending', class: 'Playgroup A', description: 'Write A to Z in notebook', attachData: null },
+        { id: 'H002', title: 'Count 1-20', subject: 'Math', dueDate: '2026-03-29', status: 'Active', class: 'Playgroup B', description: 'Write counting 1 to 20', attachData: null }
+    ];
+    
+    let exams = [
+        { id: 'EX001', name: 'Term 1 Exam', type: 'Term', startDate: '2026-03-25', endDate: '2026-03-30', status: 'Upcoming', subjects: ['English', 'Math', 'Hindi'], examDoc: null }
+    ];
+    
+    let results = [
+        { id: 'R001', studentName: 'Aarav Sharma', examName: 'Term 1', marks: { English: 85, Math: 90, Hindi: 88 }, total: 263, percentage: 87.67, grade: 'A', rank: 1, resultAttach: null }
+    ];
+    
+    let leaves = [
+        { id: 'L001', empName: 'Priya Sharma', type: 'Sick Leave', fromDate: '2026-03-28', toDate: '2026-03-29', days: 2, status: 'Pending', reason: 'Fever', medicalCert: null }
+    ];
+    
+    let classesList = [
+        { id: 'C001', name: 'Playgroup A', teacher: 'Priya Sharma', students: 2, strength: 30, room: '101', classFile: null },
+        { id: 'C002', name: 'Playgroup B', teacher: 'Rajesh Kumar', students: 1, strength: 30, room: '102' },
+        { id: 'C003', name: 'Nursery A', teacher: 'Anjali Patel', students: 1, strength: 35, room: '103' },
+        { id: 'C004', name: 'Nursery B', teacher: 'Meena Gupta', students: 1, strength: 35, room: '104' },
+        { id: 'C005', name: 'KG-1 A', teacher: 'Sunita Yadav', students: 2, strength: 35, room: '105' },
+        { id: 'C006', name: 'KG-1 B', teacher: 'Vikram Singh', students: 1, strength: 35, room: '106' },
+        { id: 'C007', name: 'KG-2 A', teacher: 'Rajesh Khanna', students: 2, strength: 35, room: '107' },
+        { id: 'C008', name: 'KG-2 B', teacher: 'Neha Sharma', students: 1, strength: 35, room: '108' }
+    ];
+    
+    let timetable = [
+        { day: 'Monday', periods: ['Math - 9:00 (Rajesh)', 'English - 10:00 (Priya)', 'Hindi - 11:00 (Anjali)', 'Art - 12:00 (Meera)'] },
+        { day: 'Tuesday', periods: ['Science - 9:00 (Anjali)', 'Math - 10:00 (Rajesh)', 'English - 11:00 (Priya)', 'Sports - 12:00 (Coach)'] },
+        { day: 'Wednesday', periods: ['Hindi - 9:00 (Anjali)', 'Math - 10:00 (Rajesh)', 'Science - 11:00 (Anjali)', 'Rhymes - 12:00 (Priya)'] },
+        { day: 'Thursday', periods: ['English - 9:00 (Priya)', 'Math - 10:00 (Rajesh)', 'Hindi - 11:00 (Anjali)', 'Art - 12:00 (Meera)'] },
+        { day: 'Friday', periods: ['Math - 9:00 (Rajesh)', 'English - 10:00 (Priya)', 'Sports - 11:00 (Coach)', 'Music - 12:00 (Music Teacher)'] }
+    ];
+    
+    let transport = [
+        { id: 'T001', route: 'Route 1 - North', vehicle: 'DL-01-1234', driver: 'Ram Singh', students: 15, stops: 'Sec-1, Sec-2, Sec-3', vehicleDoc: null },
+        { id: 'T002', route: 'Route 2 - South', vehicle: 'DL-01-5678', driver: 'Shyam Kumar', students: 12, stops: 'Sec-4, Sec-5' }
+    ];
+    
+    let expenses = [
+        { id: 'EP001', title: 'Salary Payment - March', amount: 325000, date: '2026-03-28', category: 'Salary', vendor: 'Staff', status: 'Paid', billData: null }
+    ];
+    
+    let ledger = [
+        { id: 'L001', date: new Date().toISOString().split('T')[0], description: 'Fee Collection - Various', debit: 0, credit: 11800, balance: 118000, attachData: null }
+    ];
+    
+    let events = [
+        { id: 'EV001', title: 'Annual Day', date: '2026-04-15', venue: 'School Auditorium', time: '5:00 PM', description: 'Annual function', status: 'Upcoming', posterData: null },
+        { id: 'EV002', title: 'Sports Day', date: '2026-04-25', venue: 'School Ground', time: '9:00 AM', status: 'Upcoming' }
+    ];
+    
+    let feedbacks = [
+        { id: 'FB001', from: 'Rahul Sharma', type: 'Suggestion', subject: 'Teaching Quality', description: 'Excellent teaching methods', status: 'Resolved', date: '2026-03-25', priority: 'Medium', attachData: null }
+    ];
+    
+    let notifications = [
+        { id: 'N001', title: 'Fee Reminder', message: 'Fee due date is approaching', sendTo: 'All Parents', status: 'Sent', date: '2026-03-27', read: false, attachData: null }
+    ];
+    
+    let holidays = [{ date: '2026-03-30', name: 'Holi' }, { date: '2026-04-02', name: 'Ram Navami' }];
+    let recentActivities = [
+        { id: 'ACT1', action: 'Fee Collected', details: '₹2500 from Aarav Sharma', time: '10:30 AM', icon: '💰' },
+        { id: 'ACT2', action: 'New Student Added', details: 'Ayaan Khan added to KG-2 B', time: '09:45 AM', icon: '👤' }
+    ];
+    let loginHistoryData = [{ time: new Date().toLocaleString(), ip: '192.168.1.101', device: 'Chrome/Windows' }];
+    let pendingNotifications = [
+        { id: 1, title: 'Fee Paid', message: 'Aarav Sharma paid ₹2500', icon: '💰', read: false, time: '2 min ago' },
+        { id: 2, title: 'Leave Applied', message: 'Priya Sharma applied leave', icon: '🌴', read: false, time: '5 min ago' }
+    ];
+    
+    const MODULES = [
+        { id: 1, name: 'DASHBOARD', icon: '📊', desc: 'Overview', roles: ['admin','teacher','student','cashier','accountant'] },
+        { id: 2, name: 'PROFILE', icon: '👤', desc: 'My Account', roles: ['admin','teacher','student','cashier','accountant'] },
+        { id: 3, name: 'STUDENTS', icon: '🧑‍🎓', desc: 'Student Management', roles: ['admin','teacher'] },
+        { id: 4, name: 'FEES', icon: '💰', desc: 'Fee Collection', roles: ['admin','cashier','accountant'] },
+        { id: 5, name: 'STUDENT ATTENDANCE', icon: '📋', desc: 'Student Attendance', roles: ['admin','teacher'] },
+        { id: 6, name: 'EMPLOYEE ATTENDANCE', icon: '⏱️', desc: 'Staff Attendance', roles: ['admin'] },
+        { id: 7, name: 'EMPLOYEES', icon: '👥', desc: 'Staff Management', roles: ['admin'] },
+        { id: 8, name: 'HOMEWORK', icon: '📚', desc: 'Homework', roles: ['admin','teacher'] },
+        { id: 9, name: 'EXAMS', icon: '📝', desc: 'Exam Management', roles: ['admin','teacher'] },
+        { id: 10, name: 'RESULTS', icon: '🏆', desc: 'Exam Results', roles: ['admin','teacher','student'] },
+        { id: 11, name: 'LEAVE', icon: '🌴', desc: 'Leave Management', roles: ['admin','teacher'] },
+        { id: 12, name: 'CLASSES', icon: '🏫', desc: 'Class Management', roles: ['admin','teacher'] },
+        { id: 13, name: 'TIMETABLE', icon: '⏱️', desc: 'Time Table', roles: ['admin','teacher','student'] },
+        { id: 14, name: 'TRANSPORT', icon: '🚌', desc: 'Transport', roles: ['admin'] },
+        { id: 15, name: 'EXPENSES', icon: '💸', desc: 'Expense Management', roles: ['admin','accountant'] },
+        { id: 16, name: 'LEDGER', icon: '📒', desc: 'Accounts Ledger', roles: ['admin','accountant'] },
+        { id: 17, name: 'EVENTS', icon: '🎉', desc: 'School Events', roles: ['admin','teacher','student'] },
+        { id: 18, name: 'FEEDBACK', icon: '🗣️', desc: 'Feedback System', roles: ['admin','teacher','student'] },
+        { id: 19, name: 'NOTIFICATIONS', icon: '🔔', desc: 'Notifications', roles: ['admin'] },
+        { id: 20, name: 'SETTINGS', icon: '⚙️', desc: 'System Settings', roles: ['admin'] }
+    ];
+    
+    // Helper Functions
+    function showLoader() { document.getElementById('loader').style.display = 'flex'; }
+    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+    function showNotification(msg, type='info') { if(!toastContainer){ toastContainer=document.createElement('div'); toastContainer.className='toast-container'; document.body.appendChild(toastContainer); } let toast=document.createElement('div'); toast.className='toast'; toast.style.borderLeftColor=type==='success'?'#10b981':type==='error'?'#ef4444':'var(--theme-primary)'; toast.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span><span>${msg}</span>`; toastContainer.appendChild(toast); setTimeout(()=>toast.remove(),3000); }
+    function closeModal(btn) { btn?.closest('.modal-overlay')?.remove(); }
+    function toggleFabMenu() { document.getElementById('fabMenu').classList.toggle('show'); }
+    function showDashboard() { document.getElementById('dashboardView').style.display='block'; document.getElementById('moduleView').style.display='none'; }
+    function attachFileUploadWithPreview(previewId, onFileSelected, accept="image/*,application/pdf") { let input=document.createElement('input'); input.type='file'; input.accept=accept; if(accept.includes('image')) input.setAttribute('capture','environment'); input.onchange=(e)=>{ let file=e.target.files[0]; if(!file) return; let reader=new FileReader(); reader.onload=(ev)=>{ let data=ev.target.result; onFileSelected({data:data,name:file.name,type:file.type}); let div=document.getElementById(previewId); if(div){ if(file.type.startsWith('image/')){ div.innerHTML=`<img src="${data}" class="preview-img"><div style="font-size:11px;">${file.name}</div>`; } else { div.innerHTML=`<div class="file-preview"><i class="fas fa-file-alt"></i> ${file.name}</div>`; } } }; reader.readAsDataURL(file); }; input.click(); }
+    function refreshData() { showNotification('Data refreshed','success'); }
+    function shareOnWhatsApp(text) { window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank'); }
+    function updateWeather() { let w=document.getElementById('weatherWidget'); if(w) w.innerHTML=`<div><span class="weather-temp">28°C</span><br>Sunny</div><div><i class="fas fa-map-marker-alt"></i> Delhi</div>`; }
+    function updateNotificationBadge() { let unread = pendingNotifications.filter(n=>!n.read).length; document.getElementById('notificationBadge').innerText=unread; }
+    function renderNotificationList() { let list = document.getElementById('notificationList'); if(list) list.innerHTML = pendingNotifications.map(n=>`<div class="history-item"><span><i class="fas ${n.icon==='💰'?'fa-rupee-sign':'fa-bell'}"></i> ${n.title}</span><span>${n.time}</span><button class="btn-sm btn-info" onclick="markAsRead(${n.id})">Read</button></div>`).join(''); }
+    window.markAsRead = function(id) { let n = pendingNotifications.find(n=>n.id===id); if(n) n.read=true; updateNotificationBadge(); renderNotificationList(); };
+    function markAllAsRead() { pendingNotifications.forEach(n=>n.read=true); updateNotificationBadge(); renderNotificationList(); document.getElementById('notificationPopup').classList.remove('show'); }
+    // ======================= MODULE 1: DASHBOARD =======================
+    function loadDashboard() {
+        let totalStudents = students.length;
+        let totalFees = fees.filter(f=>f.status==='Paid').reduce((s,f)=>s+f.amount,0);
+        let totalExpenses = expenses.reduce((s,e)=>s+e.amount,0);
+        let totalStaff = employees.length;
+        let todayCollection = fees.filter(f=>f.date===new Date().toISOString().split('T')[0] && f.status==='Paid').reduce((s,f)=>s+f.amount,0);
+        let pendingFees = students.reduce((s,st)=>s+st.feeDue,0);
+        let pendingLeaves = leaves.filter(l=>l.status==='Pending').length;
+        let alerts = students.filter(s=>s.attendance<75).length;
+        
+        let content = `
+            <div class="action-buttons"><input type="text" id="dashboardSearch" class="search-box" placeholder="Search..." style="flex:1;"><button class="btn btn-primary btn-sm" onclick="filterDashboard()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearDashboardFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showQuickEntryForm()">Add</button></div>
+            <div class="summary-cards">
+                <div class="summary-item"><div class="summary-value">${totalStudents}</div><div>Students</div></div>
+                <div class="summary-item"><div class="summary-value">₹${totalFees}</div><div>Fees</div></div>
+                <div class="summary-item"><div class="summary-value">₹${totalExpenses}</div><div>Expenses</div></div>
+                <div class="summary-item"><div class="summary-value">${totalStaff}</div><div>Staff</div></div>
+                <div class="summary-item"><div class="summary-value">${alerts}</div><div>Alerts</div></div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-card"><h3>📈 Fees Trend</h3><canvas id="feesTrendChart"></canvas></div>
+                <div class="chart-card"><h3>💰 Income vs Expense</h3><canvas id="incomeExpenseChart"></canvas></div>
+                <div class="chart-card"><h3>📊 Attendance Overview</h3><canvas id="attendanceOverviewChart"></canvas></div>
+            </div>
+            <div class="weather-widget" id="weatherWidget"><div><span class="weather-temp">28°C</span><br>Sunny</div><div><i class="fas fa-map-marker-alt"></i> Delhi</div></div>
+            <div class="chart-card"><h3>🔄 Recent Activities</h3>${recentActivities.map(a=>`<div class="history-item"><span><i class="fas ${a.icon==='💰'?'fa-rupee-sign':'fa-user'}"></i> ${a.action}</span><span>${a.time}</span><button class="btn-sm btn-info" onclick="viewActivity('${a.id}')">View</button><button class="btn-sm btn-success" onclick="openModule(3)">Open Module</button><button class="btn-sm btn-primary" onclick="refreshData()">Refresh</button></div>`).join('')}</div>
+            <div class="chart-card"><h3>🔔 Notifications</h3>${notifications.slice(0,3).map(n=>`<div class="history-item"><span><i class="fas fa-bell"></i> ${n.title}</span><span>${n.date}</span><button class="btn-sm btn-info" onclick="viewNotification('${n.id}')">View</button></div>`).join('')}</div>
+            <div class="chart-card"><h3>🎉 Upcoming Events</h3>${events.slice(0,3).map(e=>`<div class="history-item"><span><i class="fas fa-calendar"></i> ${e.title}</span><span>${e.date}</span><button class="btn-sm btn-info" onclick="viewEvent('${e.id}')">View</button></div>`).join('')}</div>
+        `;
+        document.getElementById('moduleContent').innerHTML = content;
+        setTimeout(() => {
+            let feesCtx = document.getElementById('feesTrendChart')?.getContext('2d');
+            if(feesCtx) new Chart(feesCtx, { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar'], datasets: [{ label: 'Fees', data: [45000, 52000, totalFees], borderColor: '#2563eb' }] } });
+            let ieCtx = document.getElementById('incomeExpenseChart')?.getContext('2d');
+            if(ieCtx) new Chart(ieCtx, { type: 'bar', data: { labels: ['Income', 'Expense'], datasets: [{ label: 'Amount', data: [totalFees, totalExpenses], backgroundColor: ['#10b981', '#ef4444'] }] } });
+            let attCtx = document.getElementById('attendanceOverviewChart')?.getContext('2d');
+            if(attCtx) new Chart(attCtx, { type: 'doughnut', data: { labels: ['Present', 'Absent'], datasets: [{ data: [75, 25], backgroundColor: ['#10b981', '#ef4444'] }] } });
+        }, 100);
+        updateWeather();
+    }
+    window.showQuickEntryForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2><i class="fas fa-bolt"></i> Quick Entry</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Module Select</label><select id="quickModule" class="form-control"><option value="fees">Fee Collection</option><option value="expense">Expense</option><option value="student">Student</option><option value="employee">Employee</option></select></div>
+            <div class="form-group"><label>Amount/Name</label><input id="quickAmount" class="form-control" placeholder="Enter amount or name"></div>
+            <div class="form-group"><label>Date</label><input id="quickDate" class="form-control" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div class="form-group"><label>Notes</label><textarea id="quickNotes" class="form-control" rows="2"></textarea></div>
+            <div class="upload-area" id="quickAttach" onclick="triggerQuickAttach()"><i class="fas fa-paperclip"></i> Attachment (Optional)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveQuickEntry()">Save</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.quickAttach=null;
+        window.triggerQuickAttach = () => attachFileUploadWithPreview('quickAttach', (f)=>{ window.quickAttach=f.data; }, 'image/*,application/pdf');
+        window.saveQuickEntry = function() { showNotification('Quick entry saved!','success'); closeModal(document.querySelector('.modal-overlay')); refreshData(); };
+    };
+    window.filterDashboard = function() { showNotification('Filter applied','info'); };
+    window.clearDashboardFilter = function() { showNotification('Filter cleared','info'); };
+    window.viewActivity = function(id) { showNotification('Viewing activity details','info'); };
+    window.viewNotification = function(id) { showNotification('Notification details','info'); };
+    window.viewEvent = function(id) { showNotification('Event details','info'); };
+    
+    // ======================= MODULE 2: PROFILE =======================
+    function loadProfile() {
+        let lastActivity = loginHistoryData[0]?.time || 'Today';
+        let content = `
+            <div class="action-buttons"><input type="text" id="profileSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterProfile()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearProfileFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showEditProfile()">Add</button></div>
+            <div style="background:linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); padding:24px; border-radius:28px; color:white; margin-bottom:20px;"><h2 style="font-size:24px;">${currentUser.name}</h2><p>${currentUser.roleDisplay} | Last Login: ${lastActivity}</p></div>
+            <div class="profile-card"><h3>Profile Information</h3>
+                <div class="info-grid"><div class="info-item"><span class="info-label">Name</span><span class="info-value">${currentUser.name}</span></div>
+                <div class="info-item"><span class="info-label">Role</span><span class="info-value">${currentUser.roleDisplay}</span></div>
+                <div class="info-item"><span class="info-label">Email</span><span class="info-value">${currentUser.name.toLowerCase().replace(' ','.')}@wings.edu</span></div>
+                <div class="info-item"><span class="info-label">Mobile</span><span class="info-value">+91 98765 43210</span></div></div>
+                <div class="upload-area" id="profilePhotoPreview" onclick="uploadProfilePhoto()"><i class="fas fa-camera"></i> Profile Photo (Crop + Preview)</div>
+                <div class="card-actions"><button class="action-chip" onclick="showEditProfile()"><i class="fas fa-edit"></i> Edit</button><button class="action-chip" onclick="showChangePassword()"><i class="fas fa-key"></i> Change Password</button></div>
+            </div>
+            <div class="profile-card"><h3>Login Information</h3><div class="history-item"><span>Last Login IP:</span><span>192.168.1.101</span></div><div class="history-item"><span>Last Login Device:</span><span>Chrome/Windows</span></div></div>
+            <div class="profile-card"><h3>📊 Activity Timeline</h3><canvas id="activityChart" style="height:150px;"></canvas></div>
+            <div class="profile-card"><h3>🔐 Login History</h3>${loginHistoryData.map(h=>`<div class="history-item"><span>${h.time}</span><span>${h.device}</span><span>${h.ip}</span></div>`).join('')}</div>
+        `;
+        document.getElementById('moduleContent').innerHTML = content;
+        setTimeout(() => { let actCtx = document.getElementById('activityChart')?.getContext('2d'); if(actCtx) new Chart(actCtx, { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], datasets: [{ label: 'Activities', data: [5, 8, 12, 7, 10], borderColor: '#2563eb' }] } }); }, 100);
+    }
+    window.uploadProfilePhoto = function() { attachFileUploadWithPreview('profilePhotoPreview', (f)=>{ showNotification('Profile photo updated!','success'); }, 'image/*'); };
+    window.showEditProfile = function() { Swal.fire({ title: 'Edit Profile', html: `<input id="editName" class="swal2-input" value="${currentUser.name}"><input id="editMobile" class="swal2-input" value="9876543210"><input id="editEmail" class="swal2-input" value="${currentUser.name.toLowerCase().replace(' ','.')}@wings.edu">`, preConfirm: () => { showNotification('Profile updated!','success'); } }); };
+    window.showChangePassword = function() { Swal.fire({ title: 'Change Password', html: `<input type="password" id="newPass" class="swal2-input" placeholder="New Password"><input type="password" id="confirmPass" class="swal2-input" placeholder="Confirm"><div id="passStrength"></div>`, didOpen: () => { document.getElementById('newPass').oninput = function() { let strength = this.value.length > 6 ? 'Strong' : this.value.length > 3 ? 'Medium' : 'Weak'; document.getElementById('passStrength').innerHTML = `Strength: ${strength}`; }; }, preConfirm: () => { showNotification('Password changed!','success'); } }); };
+    window.filterProfile = function() { showNotification('Filter applied','info'); };
+    window.clearProfileFilter = function() { showNotification('Filter cleared','info'); };
+    
+    // ======================= MODULE 3: STUDENTS (Full with Multiple Uploads) =======================
+    function loadStudentManagement() {
+        let total = students.length, boys = students.filter(s=>s.gender==='Male').length, girls = students.filter(s=>s.gender==='Female').length, newAdmission = students.filter(s=>s.admissionDate && new Date(s.admissionDate).getFullYear()===2026).length, lowAtt = students.filter(s=>s.attendance<75).length;
+        let content = `
+            <div class="action-buttons"><input type="text" id="studentSearch" class="search-box" placeholder="Search by name, class..." onkeyup="filterStudentList()"><button class="btn btn-primary btn-sm" onclick="filterStudentList()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearStudentFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddStudentForm()">Add</button></div>
+            <div class="summary-cards">
+                <div class="summary-item"><div class="summary-value">${total}</div><div>Total Students</div></div>
+                <div class="summary-item"><div class="summary-value">${boys}/${girls}</div><div>Boys/Girls</div></div>
+                <div class="summary-item"><div class="summary-value">${newAdmission}</div><div>New Admission</div></div>
+                <div class="summary-item"><div class="summary-value">${lowAtt}</div><div>Low Attendance</div></div>
+            </div>
+            <div class="filter-group"><span class="filter-chip active" onclick="filterStudentClass('all')">All</span><span class="filter-chip" onclick="filterStudentClass('Playgroup')">Playgroup</span><span class="filter-chip" onclick="filterStudentClass('Nursery')">Nursery</span><span class="filter-chip" onclick="filterStudentClass('KG-1')">KG-1</span><span class="filter-chip" onclick="filterStudentClass('KG-2')">KG-2</span></div>
+            <div class="chart-container"><div class="chart-card"><h3>Class Strength</h3><canvas id="classChart"></canvas></div><div class="chart-card"><h3>Gender Ratio</h3><canvas id="genderChart"></canvas></div></div>
+            <div id="studentsList" class="cards-container"></div>
+        `;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderStudentList();
+        setTimeout(() => {
+            let classData = { Playgroup: students.filter(s=>s.cls==='Playgroup').length, Nursery: students.filter(s=>s.cls==='Nursery').length, 'KG-1': students.filter(s=>s.cls==='KG-1').length, 'KG-2': students.filter(s=>s.cls==='KG-2').length };
+            new Chart(document.getElementById('classChart'), { type: 'bar', data: { labels: Object.keys(classData), datasets: [{ label: 'Students', data: Object.values(classData), backgroundColor: '#2563eb' }] } });
+            new Chart(document.getElementById('genderChart'), { type: 'doughnut', data: { labels: ['Boys', 'Girls'], datasets: [{ data: [boys, girls], backgroundColor: ['#2563eb', '#ec4899'] }] } });
+        }, 100);
+    }
+    function renderStudentList() {
+        let html = students.map(s => `
+            <div class="data-card">
+                <div class="card-header"><div class="card-photo">${s.photoData ? `<img src="${s.photoData}">` : (s.gender==='Male'?'👦':'👧')}</div>
+                <div class="card-title"><h3>${s.name}</h3><p>${s.cls} ${s.sec} | Roll: ${s.roll} | ${s.admissionNo || 'ADM'+s.id}</p></div>
+                <span class="badge ${s.feeDue>0?'badge-warning':'badge-success'}">${s.attendance}%</span></div>
+                <div class="progress-container"><div class="progress-bar" style="width:${s.attendance}%"></div></div>
+                <div class="card-actions">
+                    <button class="action-chip" onclick="viewStudent('${s.id}')"><i class="fas fa-eye"></i> View</button>
+                    <button class="action-chip" onclick="editStudent('${s.id}')"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="action-chip" onclick="deleteStudent('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+                    <button class="action-chip" onclick="printIDCard('${s.id}')"><i class="fas fa-id-card"></i> Print ID</button>
+                    <button class="action-chip" onclick="showCollectFeeForStudent('${s.name}')"><i class="fas fa-rupee-sign"></i> Fees</button>
+                    <button class="action-chip" onclick="showMarkAttendanceForStudent('${s.name}')"><i class="fas fa-check"></i> Attendance</button>
+                    <button class="action-chip" onclick="shareOnWhatsApp('Student: ${s.name}, Class: ${s.cls} ${s.sec}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                </div>
+            </div>`).join('');
+        document.getElementById('studentsList').innerHTML = html;
+    }
+    window.showAddStudentForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2><i class="fas fa-user-plus"></i> Add New Student</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Full Name *</label><input id="stuName" class="form-control"></div>
+            <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><div class="form-group"><label>Date of Birth</label><input id="stuDob" class="form-control" type="date" onchange="calculateAge()"></div><div class="form-group"><label>Gender</label><select id="stuGender" class="form-control"><option>Male</option><option>Female</option></select></div></div>
+            <div class="form-group"><label>Admission No (Auto)</label><input id="stuAdmissionNo" class="form-control" value="ADM${Math.floor(1000+Math.random()*9000)}" readonly></div>
+            <div class="form-row"><div class="form-group"><label>Blood Group</label><select id="stuBlood" class="form-control"><option>O+</option><option>A+</option><option>B+</option><option>AB+</option></select></div><div class="form-group"><label>Religion</label><input id="stuReligion" class="form-control" placeholder="Hindu/Muslim/..."></div></div>
+            <div class="form-row"><div class="form-group"><label>Category</label><select id="stuCategory" class="form-control"><option>General</option><option>OBC</option><option>SC</option><option>ST</option></select></div><div class="form-group"><label>Mobile</label><input id="stuMobile" class="form-control"></div></div>
+            <div class="form-group"><label>Email</label><input id="stuEmail" class="form-control" type="email"></div>
+            <div class="form-group"><label>Address</label><textarea id="stuAddress" class="form-control" rows="2"></textarea></div>
+            <div class="form-row"><div class="form-group"><label>Father Name</label><input id="stuFather" class="form-control"></div><div class="form-group"><label>Father Mobile</label><input id="stuFatherMobile" class="form-control"></div></div>
+            <div class="form-row"><div class="form-group"><label>Mother Name</label><input id="stuMother" class="form-control"></div><div class="form-group"><label>Mother Mobile</label><input id="stuMotherMobile" class="form-control"></div></div>
+            <div class="form-row"><div class="form-group"><label>Class</label><select id="stuClass" class="form-control"><option>Playgroup</option><option>Nursery</option><option>KG-1</option><option>KG-2</option></select></div><div class="form-group"><label>Section</label><select id="stuSec" class="form-control"><option>A</option><option>B</option></select></div></div>
+            <div class="form-group"><label>Roll Number</label><input id="stuRoll" class="form-control" type="number"></div>
+            <div class="upload-area" id="studentPhotoUpload" onclick="triggerStudentPhoto()"><i class="fas fa-camera"></i> 📸 Student Photo</div>
+            <div class="upload-area" id="studentAadharUpload" onclick="triggerStudentAadhar()"><i class="fas fa-id-card"></i> Aadhar Card</div>
+            <div class="upload-area" id="studentBirthUpload" onclick="triggerStudentBirth()"><i class="fas fa-calendar"></i> Birth Certificate</div>
+            <div class="upload-area" id="studentTCUpload" onclick="triggerStudentTC()"><i class="fas fa-file-alt"></i> Transfer Certificate</div>
+            <div class="upload-area" id="studentOtherUpload" onclick="triggerStudentOther()"><i class="fas fa-folder"></i> Other Documents (Multiple)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveStudentWithDocs()">Save Student</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.studentPhoto=null; window.studentAadhar=null; window.studentBirth=null; window.studentTC=null; window.studentOther=[];
+        window.triggerStudentPhoto = () => attachFileUploadWithPreview('studentPhotoUpload', (f)=>{ window.studentPhoto=f.data; }, 'image/*');
+        window.triggerStudentAadhar = () => attachFileUploadWithPreview('studentAadharUpload', (f)=>{ window.studentAadhar=f.data; }, 'image/*');
+        window.triggerStudentBirth = () => attachFileUploadWithPreview('studentBirthUpload', (f)=>{ window.studentBirth=f.data; }, 'image/*');
+        window.triggerStudentTC = () => attachFileUploadWithPreview('studentTCUpload', (f)=>{ window.studentTC=f.data; }, 'application/pdf');
+        window.triggerStudentOther = () => { let input=document.createElement('input'); input.type='file'; input.multiple=true; input.accept='image/*,application/pdf,.doc,.docx'; input.onchange=(e)=>{ Array.from(e.target.files).forEach(f=>{ let reader=new FileReader(); reader.onload=(ev)=>{ window.studentOther.push({name:f.name,data:ev.target.result}); document.getElementById('studentOtherUpload').innerHTML += `<div class="file-preview"><i class="fas fa-file"></i> ${f.name}</div>`; }; reader.readAsDataURL(f); }); }; input.click(); };
+        window.saveStudentWithDocs = function() {
+            let name = document.getElementById('stuName')?.value;
+            if(!name) { showNotification('Enter student name','error'); return; }
+            students.push({ id:'S'+(students.length+101), photoData:window.studentPhoto, aadharData:window.studentAadhar, birthData:window.studentBirth, tcData:window.studentTC, otherDocs:window.studentOther, name:name, cls:document.getElementById('stuClass')?.value, sec:document.getElementById('stuSec')?.value, roll:students.length+1, gender:document.getElementById('stuGender')?.value, fatherName:document.getElementById('stuFather')?.value||'', motherName:document.getElementById('stuMother')?.value||'', fatherMobile:document.getElementById('stuFatherMobile')?.value, motherMobile:document.getElementById('stuMotherMobile')?.value, feeDue:0, attendance:0, status:'Active', bloodGroup:document.getElementById('stuBlood')?.value, religion:document.getElementById('stuReligion')?.value, category:document.getElementById('stuCategory')?.value, dob:document.getElementById('stuDob')?.value, mobile:document.getElementById('stuMobile')?.value, email:document.getElementById('stuEmail')?.value, address:document.getElementById('stuAddress')?.value, admissionNo:document.getElementById('stuAdmissionNo')?.value, admissionDate:new Date().toISOString().split('T')[0] });
+            showNotification(`✅ Student ${name} added with documents!`, 'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadStudentManagement();
+        };
+    };
+    window.calculateAge = function() { let dob = document.getElementById('stuDob')?.value; if(dob) { let age = new Date().getFullYear() - new Date(dob).getFullYear(); showNotification(`Age: ${age} years`,'info'); } };
+    window.viewStudent = function(id) { let s = students.find(s=>s.id===id); Swal.fire({ title: s.name, html: `<div><img src="${s.photoData || 'https://via.placeholder.com/100'}" style="width:100px; border-radius:50%;"><p><strong>Admission No:</strong> ${s.admissionNo}</p><p><strong>Class:</strong> ${s.cls} ${s.sec} | Roll: ${s.roll}</p><p><strong>Father:</strong> ${s.fatherName} (${s.fatherMobile})</p><p><strong>Mother:</strong> ${s.motherName} (${s.motherMobile})</p><p><strong>Fee Due:</strong> ₹${s.feeDue}</p><p><strong>Attendance:</strong> ${s.attendance}%</p><p><strong>Blood Group:</strong> ${s.bloodGroup}</p><p><strong>Mobile:</strong> ${s.mobile}</p>${s.aadharData?'<p>✅ Aadhar Card Uploaded</p>':''}${s.birthData?'<p>✅ Birth Certificate Uploaded</p>':''}${s.tcData?'<p>✅ Transfer Certificate Uploaded</p>':''}${s.otherDocs.length?'<p>✅ ${s.otherDocs.length} Other Documents</p>':''}</div>`, width: '90%' }); };
+    window.editStudent = function(id) { showNotification('Edit student feature','info'); };
+    window.deleteStudent = function(id) { Swal.fire({ title: 'Delete Student?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ students = students.filter(s=>s.id!==id); showNotification('Student deleted','success'); loadStudentManagement(); } }); };
+    window.printIDCard = function(id) { let s = students.find(s=>s.id===id); let printContent = `<div style="text-align:center; padding:20px; border:2px solid #000; width:300px;"><h3>WINGS CONVENT</h3><img src="${s.photoData || ''}" style="width:100px; height:100px; border-radius:50%;"><p><strong>${s.name}</strong></p><p>${s.cls} ${s.sec} | Roll: ${s.roll}</p><p>Admission No: ${s.admissionNo}</p><p>Valid Till: 2027-03-31</p></div>`; let win = window.open(); win.document.write(printContent); win.print(); };
+    window.showCollectFeeForStudent = function(studentName) { showCollectFeeForm(studentName); };
+    window.showMarkAttendanceForStudent = function(studentName) { showMarkAttendanceForm(studentName); };
+    window.filterStudentList = function() { renderStudentList(); };
+    window.filterStudentClass = function(cls) { renderStudentList(); };
+    window.clearStudentFilter = function() { renderStudentList(); };
+    // ======================= MODULE 4: FEES (With Receipt System) =======================
+    function loadFeeCollection() {
+        let totalCollected = fees.filter(f=>f.status==='Paid').reduce((s,f)=>s+f.amount,0);
+        let totalPending = fees.filter(f=>f.status==='Pending').reduce((s,f)=>s+f.amount,0);
+        let todayCollected = fees.filter(f=>f.date===new Date().toISOString().split('T')[0] && f.status==='Paid').reduce((s,f)=>s+f.amount,0);
+        let overdue = students.filter(s=>s.feeDue>0 && new Date() > new Date('2026-03-20')).length;
+        let content = `
+            <div class="action-buttons"><input type="text" id="feeSearch" class="search-box" placeholder="Search student..." onkeyup="filterFeeList()"><button class="btn btn-primary btn-sm" onclick="filterFeeList()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearFeeFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showCollectFeeForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">₹${totalCollected}</div><div>Total Collected</div></div><div class="summary-item"><div class="summary-value">₹${totalPending}</div><div>Pending</div></div><div class="summary-item"><div class="summary-value">₹${todayCollected}</div><div>Today Collection</div></div><div class="summary-item"><div class="summary-value">${overdue}</div><div>Overdue</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Monthly Collection</h3><canvas id="monthlyFeeChart"></canvas></div><div class="chart-card"><h3>Paid vs Pending</h3><canvas id="paidPendingChart"></canvas></div></div>
+            <div id="feesList" class="cards-container"></div>
+        `;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderFeeList();
+        setTimeout(() => {
+            new Chart(document.getElementById('monthlyFeeChart'), { type: 'bar', data: { labels: ['Jan', 'Feb', 'Mar'], datasets: [{ label: 'Collection', data: [45000, 52000, totalCollected], backgroundColor: '#2563eb' }] } });
+            new Chart(document.getElementById('paidPendingChart'), { type: 'doughnut', data: { labels: ['Paid', 'Pending'], datasets: [{ data: [totalCollected, totalPending], backgroundColor: ['#10b981', '#f59e0b'] }] } });
+        }, 100);
+    }
+    function renderFeeList() {
+        let html = fees.map(f => `<div class="data-card"><div class="card-header"><div class="card-photo">💰</div><div class="card-title"><h3>${f.studentName}</h3><p>Receipt: ${f.receiptNo} | ${f.date}</p></div><span class="badge ${f.status==='Paid'?'badge-success':'badge-warning'}">${f.status}</span></div><div class="info-grid"><div class="info-item"><span class="info-label">Amount</span><span class="info-value">₹${f.amount}</span></div><div class="info-item"><span class="info-label">Mode</span><span class="info-value">${f.mode}</span></div><div class="info-item"><span class="info-label">Discount/Fine</span><span class="info-value">₹${f.discount||0}/₹${f.fine||0}</span></div><div class="info-item"><span class="info-label">Transaction ID</span><span class="info-value">${f.transactionId || '-'}</span></div></div><div class="card-actions"><button class="action-chip" onclick="viewReceipt('${f.id}')"><i class="fas fa-receipt"></i> View Receipt</button><button class="action-chip" onclick="printReceipt('${f.id}')"><i class="fas fa-print"></i> Print</button><button class="action-chip" onclick="downloadReceiptPDF('${f.id}')"><i class="fas fa-file-pdf"></i> PDF</button><button class="action-chip" onclick="shareOnWhatsApp('Fee Receipt: ₹${f.amount} for ${f.studentName}')"><i class="fab fa-whatsapp"></i> WhatsApp</button><button class="action-chip" onclick="viewPaymentHistory('${f.studentName}')"><i class="fas fa-history"></i> History</button></div></div>`).join('');
+        document.getElementById('feesList').innerHTML = html;
+    }
+    window.showCollectFeeForm = function(preSelectedStudent = null) {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        let receiptNo = 'REC' + new Date().getFullYear() + (new Date().getMonth()+1) + Math.floor(1000+Math.random()*9000);
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2><i class="fas fa-receipt"></i> Fee Collection Receipt</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Student Select</label><select id="feeStudent" class="form-control">${students.map(s=>`<option ${preSelectedStudent===s.name?'selected':''} value="${s.name}">${s.name} (${s.cls} ${s.sec}) - Due: ₹${s.feeDue}</option>`)}</select></div>
+            <div class="form-group"><label>Fee Type</label><select id="feeType" class="form-control"><option>Tuition Fee</option><option>Transport Fee</option><option>Activity Fee</option><option>Exam Fee</option><option>Development Fee</option></select></div>
+            <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><div class="form-group"><label>Amount</label><input id="feeAmount" class="form-control" type="number" value="2500" oninput="calculateFeeTotal()"></div><div class="form-group"><label>Discount (₹)</label><input id="feeDiscount" class="form-control" type="number" value="0" oninput="calculateFeeTotal()"></div></div>
+            <div class="form-row"><div class="form-group"><label>Late Fine (₹)</label><input id="feeFine" class="form-control" type="number" value="0" oninput="calculateFeeTotal()"></div><div class="form-group"><label>Final Amount</label><input id="feeFinal" class="form-control" type="number" readonly></div></div>
+            <div class="form-group"><label>Payment Mode</label><select id="feeMode" class="form-control" onchange="updateReceiptPreview()"><option>Cash</option><option>Online Transfer</option><option>Cheque</option><option>UPI</option></select></div>
+            <div class="form-group"><label>Transaction ID / Cheque No</label><input id="transactionId" class="form-control" placeholder="Optional"></div>
+            <div class="form-group"><label>Payment Date</label><input id="feeDate" class="form-control" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div class="upload-area" id="paymentScreenshot" onclick="triggerPaymentScreenshot()"><i class="fas fa-image"></i> Upload Payment Screenshot</div>
+            <div class="upload-area" id="receiptFileUpload" onclick="triggerReceiptFile()"><i class="fas fa-file-pdf"></i> Upload Receipt File</div>
+            <div class="receipt-preview" id="receiptPreview"><div class="receipt-header"><div class="receipt-title">WINGS CONVENT SCHOOL</div><div>Fee Receipt</div></div><div class="receipt-details"><div><strong>Receipt No:</strong> ${receiptNo}</div><div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div><div><strong>Student:</strong> <span id="previewStudent">-</span></div><div><strong>Class:</strong> <span id="previewClass">-</span></div><div><strong>Amount:</strong> ₹<span id="previewAmount">0</span></div><div><strong>Mode:</strong> <span id="previewMode">Cash</span></div><div><strong>Transaction ID:</strong> <span id="previewTxn">-</span></div></div><div class="receipt-footer">This is a computer generated receipt | Valid without signature</div></div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveFeeWithReceipt('${receiptNo}')"><i class="fas fa-save"></i> Save & Print Receipt</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.calculateFeeTotal = function() { let amt=parseFloat(document.getElementById('feeAmount').value)||0, disc=parseFloat(document.getElementById('feeDiscount').value)||0, fine=parseFloat(document.getElementById('feeFine').value)||0; document.getElementById('feeFinal').value = amt - disc + fine; document.getElementById('previewAmount').innerText = amt - disc + fine; };
+        window.updateReceiptPreview = function() { document.getElementById('previewMode').innerText = document.getElementById('feeMode').value; };
+        document.getElementById('feeStudent').onchange = function() { let s = students.find(s=>s.name===this.value); document.getElementById('previewStudent').innerText = s?.name || '-'; document.getElementById('previewClass').innerText = `${s?.cls || ''} ${s?.sec || ''}`; };
+        document.getElementById('transactionId').oninput = function() { document.getElementById('previewTxn').innerText = this.value || '-'; };
+        let s = students.find(s=>s.name===preSelectedStudent) || students[0];
+        document.getElementById('previewStudent').innerText = s?.name || '-';
+        document.getElementById('previewClass').innerText = `${s?.cls || ''} ${s?.sec || ''}`;
+        document.getElementById('previewAmount').innerText = '2500';
+        window.paymentScreenshotData=null; window.receiptFileData=null;
+        window.triggerPaymentScreenshot = () => attachFileUploadWithPreview('paymentScreenshot', (f)=>{ window.paymentScreenshotData=f.data; }, 'image/*');
+        window.triggerReceiptFile = () => attachFileUploadWithPreview('receiptFileUpload', (f)=>{ window.receiptFileData=f.data; }, 'application/pdf');
+        window.saveFeeWithReceipt = function(receiptNo) {
+            let student = document.getElementById('feeStudent').value;
+            let amount = parseFloat(document.getElementById('feeFinal').value);
+            let mode = document.getElementById('feeMode').value;
+            let feeType = document.getElementById('feeType').value;
+            let discount = parseFloat(document.getElementById('feeDiscount').value)||0;
+            let fine = parseFloat(document.getElementById('feeFine').value)||0;
+            let transactionId = document.getElementById('transactionId').value;
+            fees.push({ id:'F'+Date.now(), receiptNo:receiptNo, studentName:student, amount:amount, date:document.getElementById('feeDate').value, mode:mode, status:'Paid', discount:discount, fine:fine, feeType:feeType, transactionId:transactionId, paymentScreenshot:window.paymentScreenshotData, receiptFile:window.receiptFileData });
+            let stu = students.find(s=>s.name===student);
+            if(stu) stu.feeDue = Math.max(0, stu.feeDue - amount);
+            showNotification(`✅ Fee collected! Receipt: ${receiptNo}`, 'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadFeeCollection();
+        };
+        calculateFeeTotal();
+    };
+    window.viewReceipt = function(id) { let f = fees.find(f=>f.id===id); if(f) Swal.fire({ title: 'Fee Receipt', html: `<div class="receipt-preview"><div class="receipt-header"><div class="receipt-title">WINGS CONVENT SCHOOL</div><div>Fee Receipt</div></div><div class="receipt-details"><div><strong>Receipt No:</strong> ${f.receiptNo}</div><div><strong>Date:</strong> ${f.date}</div><div><strong>Student:</strong> ${f.studentName}</div><div><strong>Amount:</strong> ₹${f.amount}</div><div><strong>Mode:</strong> ${f.mode}</div><div><strong>Discount:</strong> ₹${f.discount||0}</div><div><strong>Fine:</strong> ₹${f.fine||0}</div><div><strong>Transaction ID:</strong> ${f.transactionId||'-'}</div></div><div class="receipt-footer">Thank you for your payment</div></div>`, width: '450px' }); };
+    window.printReceipt = function(id) { let f = fees.find(f=>f.id===id); if(f) { let printContent = `<div style="padding:20px; font-family:monospace;"><div style="text-align:center;"><h2>WINGS CONVENT SCHOOL</h2><p>Fee Receipt</p><hr></div><p><strong>Receipt No:</strong> ${f.receiptNo}</p><p><strong>Date:</strong> ${f.date}</p><p><strong>Student:</strong> ${f.studentName}</p><p><strong>Amount:</strong> ₹${f.amount}</p><p><strong>Mode:</strong> ${f.mode}</p><hr><p style="text-align:center;">This is a computer generated receipt</p></div>`; let win = window.open(); win.document.write(printContent); win.print(); } };
+    window.downloadReceiptPDF = function(id) { showNotification('PDF download started','info'); };
+    window.viewPaymentHistory = function(studentName) { showNotification(`Payment history for ${studentName}`,'info'); };
+    window.filterFeeList = function() { renderFeeList(); };
+    window.clearFeeFilter = function() { renderFeeList(); };
+    
+    // ======================= MODULE 5: STUDENT ATTENDANCE =======================
+    function loadAttendance() {
+        let present = attendance.filter(a=>a.status==='Present').length;
+        let absent = attendance.filter(a=>a.status==='Absent').length;
+        let percentage = Math.round((present/(present+absent))*100) || 0;
+        let content = `<div class="action-buttons"><input type="text" id="attSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterAttendance()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearAttendanceFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showMarkAttendanceForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${present}</div><div>Present</div></div><div class="summary-item"><div class="summary-value">${absent}</div><div>Absent</div></div><div class="summary-item"><div class="summary-value">${percentage}%</div><div>Attendance %</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Daily Attendance Trend</h3><canvas id="dailyAttChart"></canvas></div><div class="chart-card"><h3>Monthly Calendar View</h3><canvas id="calendarChart"></canvas></div></div>
+            <div id="attendanceList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderAttendanceList();
+        setTimeout(() => {
+            new Chart(document.getElementById('dailyAttChart'), { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], datasets: [{ label: 'Present %', data: [88, 92, 85, 90, 87], borderColor: '#2563eb' }] } });
+            new Chart(document.getElementById('calendarChart'), { type: 'bar', data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: 'Attendance', data: [92, 88, 85, 90], backgroundColor: '#10b981' }] } });
+        }, 100);
+    }
+    function renderAttendanceList() {
+        let html = attendance.map(a => `<div class="data-card"><div class="card-header"><div class="card-photo">📋</div><div class="card-title"><h3>${a.studentName}</h3><p>${a.date} | ${a.class}</p></div><span class="badge ${a.status==='Present'?'badge-success':'badge-danger'}">${a.status}</span></div><div class="card-actions"><button class="action-chip" onclick="markAttendanceToday('${a.studentName}')"><i class="fas fa-check"></i> Mark</button><button class="action-chip" onclick="editAttendance('${a.id}')"><i class="fas fa-edit"></i> Edit</button><button class="action-chip" onclick="generateAttendanceReport('${a.studentName}')"><i class="fas fa-file-alt"></i> Report</button><button class="action-chip" onclick="notifyParent('${a.studentName}')"><i class="fas fa-bell"></i> Notify Parent</button><button class="action-chip" onclick="window.print()"><i class="fas fa-print"></i> Print</button></div></div>`).join('');
+        document.getElementById('attendanceList').innerHTML = html;
+    }
+    window.showMarkAttendanceForm = function(preStudent = null) {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2><i class="fas fa-check-circle"></i> Mark Attendance</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Class</label><select id="attClass" class="form-control"><option>Playgroup A</option><option>Playgroup B</option><option>Nursery A</option><option>Nursery B</option><option>KG-1 A</option><option>KG-1 B</option><option>KG-2 A</option><option>KG-2 B</option></select></div>
+            <div class="form-group"><label>Date</label><input id="attDate" class="form-control" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div id="studentAttendanceList">${students.map(s=>`<div style="display:flex; align-items:center; gap:10px; margin:10px 0;"><span style="width:120px;">${s.name}</span><select id="status_${s.id}" class="form-control" style="flex:1;"><option>Present</option><option>Absent</option><option>Late</option></select></div>`).join('')}</div>
+            <div class="upload-area" id="attProofUpload" onclick="triggerAttProof()"><i class="fas fa-camera"></i> Attendance Proof (Optional)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveBulkAttendance()">Save Attendance</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.attProofData=null;
+        window.triggerAttProof = () => attachFileUploadWithPreview('attProofUpload', (f)=>{ window.attProofData=f.data; }, 'image/*');
+        window.saveBulkAttendance = function() {
+            let date = document.getElementById('attDate').value;
+            students.forEach(s => {
+                let status = document.getElementById(`status_${s.id}`)?.value;
+                if(status) {
+                    let existing = attendance.find(a=>a.studentName===s.name && a.date===date);
+                    if(existing) existing.status = status;
+                    else attendance.push({ id:'A'+Date.now()+s.id, date:date, studentName:s.name, status:status, class:s.cls+' '+s.sec, proofData:window.attProofData });
+                }
+            });
+            showNotification('Attendance marked successfully!','success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadAttendance();
+        };
+    };
+    window.markAttendanceToday = function(studentName) {
+        let today = new Date().toISOString().split('T')[0];
+        let existing = attendance.find(a=>a.studentName===studentName && a.date===today);
+        if(existing) { existing.status = existing.status==='Present'?'Absent':'Present'; showNotification(`${studentName} marked as ${existing.status}`, 'success'); }
+        else { attendance.push({ id:'A'+Date.now(), date:today, studentName:studentName, status:'Present', class:'General' }); showNotification(`${studentName} marked as Present`, 'success'); }
+        loadAttendance();
+    };
+    window.editAttendance = function(id) { let att = attendance.find(a=>a.id===id); if(att) { Swal.fire({ title: 'Edit Attendance', html: `<select id="editStatus" class="swal2-select"><option ${att.status==='Present'?'selected':''}>Present</option><option ${att.status==='Absent'?'selected':''}>Absent</option><option ${att.status==='Late'?'selected':''}>Late</option></select>`, preConfirm: () => { att.status = document.getElementById('editStatus').value; showNotification('Attendance updated!','success'); loadAttendance(); } }); } };
+    window.generateAttendanceReport = function(studentName) { showNotification(`Attendance report for ${studentName} generated`,'success'); };
+    window.notifyParent = function(studentName) { showNotification(`Parent notification sent for ${studentName}`,'success'); };
+    window.filterAttendance = function() { renderAttendanceList(); };
+    window.clearAttendanceFilter = function() { renderAttendanceList(); };
+    
+    // ======================= MODULE 6: EMPLOYEE ATTENDANCE =======================
+    function loadEmpAttendance() {
+        let present = empAttendance.filter(a=>a.status==='Present').length;
+        let late = empAttendance.filter(a=>a.status==='Late').length;
+        let totalHours = empAttendance.reduce((s,a)=>s+a.hours,0);
+        let content = `<div class="action-buttons"><input type="text" id="empAttSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterEmpAttendance()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearEmpAttendanceFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showMarkEmpAttendanceForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${present}</div><div>Present</div></div><div class="summary-item"><div class="summary-value">${late}</div><div>Late</div></div><div class="summary-item"><div class="summary-value">${totalHours}</div><div>Total Hours</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Daily Trend</h3><canvas id="empAttTrendChart"></canvas></div></div>
+            <div id="empAttList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderEmpAttendanceList();
+        setTimeout(() => { new Chart(document.getElementById('empAttTrendChart'), { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], datasets: [{ label: 'Present %', data: [95, 88, 92, 90, 85], borderColor: '#f59e0b' }] } }); }, 100);
+    }
+    function renderEmpAttendanceList() {
+        let html = empAttendance.map(a => `<div class="data-card"><div class="card-header"><div class="card-photo">⏱️</div><div class="card-title"><h3>${a.empName}</h3><p>${a.date} | ${a.inTime} - ${a.outTime}</p></div><span class="badge ${a.status==='Present'?'badge-success':'badge-warning'}">${a.status}</span></div><div class="info-grid"><div class="info-item"><span class="info-label">Hours</span><span class="info-value">${a.hours} hrs</span></div></div><div class="card-actions"><button class="action-chip" onclick="markEmpAttendanceToday('${a.empName}')"><i class="fas fa-check"></i> Mark</button><button class="action-chip" onclick="editEmpAttendance('${a.id}')"><i class="fas fa-edit"></i> Edit</button><button class="action-chip" onclick="generateEmpReport('${a.empName}')"><i class="fas fa-file-alt"></i> Report</button><button class="action-chip" onclick="window.print()"><i class="fas fa-print"></i> Print</button></div></div>`).join('');
+        document.getElementById('empAttList').innerHTML = html;
+    }
+    window.showMarkEmpAttendanceForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2><i class="fas fa-check-circle"></i> Mark Employee Attendance</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Date</label><input id="empAttDate" class="form-control" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div id="employeeAttendanceList">${employees.map(e=>`<div style="display:flex; align-items:center; gap:10px; margin:10px 0;"><span style="width:120px;">${e.name}</span><select id="empStatus_${e.id}" class="form-control" style="flex:1;"><option>Present</option><option>Absent</option><option>Late</option></select><input type="time" id="empIn_${e.id}" placeholder="In" style="width:80px;"><input type="time" id="empOut_${e.id}" placeholder="Out" style="width:80px;"></div>`).join('')}</div>
+            <div class="upload-area" id="empAttProof" onclick="triggerEmpAttProof()"><i class="fas fa-camera"></i> Attendance Proof (Optional)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveBulkEmpAttendance()">Save Attendance</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.empAttProof=null;
+        window.triggerEmpAttProof = () => attachFileUploadWithPreview('empAttProof', (f)=>{ window.empAttProof=f.data; }, 'image/*');
+        window.saveBulkEmpAttendance = function() {
+            let date = document.getElementById('empAttDate').value;
+            employees.forEach(e => {
+                let status = document.getElementById(`empStatus_${e.id}`)?.value;
+                let inTime = document.getElementById(`empIn_${e.id}`)?.value || '09:00';
+                let outTime = document.getElementById(`empOut_${e.id}`)?.value || '17:00';
+                if(status) {
+                    let hours = (new Date(`2000-01-01T${outTime}`) - new Date(`2000-01-01T${inTime}`)) / (1000*60*60);
+                    let existing = empAttendance.find(a=>a.empName===e.name && a.date===date);
+                    if(existing) { existing.status=status; existing.inTime=inTime; existing.outTime=outTime; existing.hours=hours; existing.proofData=window.empAttProof; }
+                    else { empAttendance.push({ id:'EA'+Date.now()+e.id, date:date, empName:e.name, status:status, inTime:inTime, outTime:outTime, hours:hours, proofData:window.empAttProof }); }
+                }
+            });
+            showNotification('Employee attendance marked!','success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadEmpAttendance();
+        };
+    };
+    window.markEmpAttendanceToday = function(empName) {
+        let today = new Date().toISOString().split('T')[0];
+        let existing = empAttendance.find(a=>a.empName===empName && a.date===today);
+        if(existing) { existing.status = existing.status==='Present'?'Absent':'Present'; showNotification(`${empName} marked as ${existing.status}`, 'success'); }
+        else { empAttendance.push({ id:'EA'+Date.now(), date:today, empName:empName, status:'Present', inTime:'09:00', outTime:'17:00', hours:8 }); showNotification(`${empName} marked as Present`, 'success'); }
+        loadEmpAttendance();
+    };
+    window.editEmpAttendance = function(id) { let att = empAttendance.find(a=>a.id===id); if(att) { Swal.fire({ title: 'Edit Employee Attendance', html: `<select id="editEmpStatus" class="swal2-select"><option ${att.status==='Present'?'selected':''}>Present</option><option ${att.status==='Absent'?'selected':''}>Absent</option><option ${att.status==='Late'?'selected':''}>Late</option></select><input id="editInTime" class="swal2-input" value="${att.inTime}" placeholder="In Time"><input id="editOutTime" class="swal2-input" value="${att.outTime}" placeholder="Out Time">`, preConfirm: () => { att.status = document.getElementById('editEmpStatus').value; att.inTime = document.getElementById('editInTime').value; att.outTime = document.getElementById('editOutTime').value; showNotification('Attendance updated!','success'); loadEmpAttendance(); } }); } };
+    window.generateEmpReport = function(empName) { showNotification(`Attendance report for ${empName} generated`,'success'); };
+    window.filterEmpAttendance = function() { renderEmpAttendanceList(); };
+    window.clearEmpAttendanceFilter = function() { renderEmpAttendanceList(); };
+    // ======================= MODULE 7: EMPLOYEES (Full with Multiple Uploads) =======================
+    function loadEmployeeManagement() {
+        if(currentUser.role !== 'admin') { document.getElementById('moduleContent').innerHTML = '<div class="profile-card"><h3>⛔ Access Denied</h3><p>Only administrators can access this module.</p></div>'; return; }
+        let total = employees.length, active = employees.filter(e=>e.status==='Active').length, salarySum = employees.reduce((s,e)=>s+e.salary,0);
+        let content = `<div class="action-buttons"><input type="text" id="empSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterEmployeeList()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearEmployeeFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddEmployeeForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${total}</div><div>Total Staff</div></div><div class="summary-item"><div class="summary-value">${active}</div><div>Active Staff</div></div><div class="summary-item"><div class="summary-value">₹${salarySum}</div><div>Salary Summary</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Department-wise Staff</h3><canvas id="deptChart"></canvas></div></div>
+            <div id="empList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderEmployeeList();
+        setTimeout(() => { let deptData = { Teaching: employees.filter(e=>e.department==='Teaching').length, Accounts: employees.filter(e=>e.department==='Accounts').length, Admin: employees.filter(e=>e.department==='Admin').length }; new Chart(document.getElementById('deptChart'), { type: 'pie', data: { labels: Object.keys(deptData), datasets: [{ data: Object.values(deptData), backgroundColor: ['#2563eb', '#10b981', '#f59e0b'] }] } }); }, 100);
+    }
+    function renderEmployeeList() {
+        let html = employees.map(e => `<div class="data-card"><div class="card-header"><div class="card-photo">${e.photoData ? `<img src="${e.photoData}">` : '👤'}</div><div class="card-title"><h3>${e.name}</h3><p>${e.department} | ${e.designation}</p></div><span class="badge badge-success">${e.status}</span></div><div class="info-grid"><div class="info-item"><span class="info-label">Salary</span><span class="info-value">₹${e.salary}</span></div><div class="info-item"><span class="info-label">Mobile</span><span class="info-value">${e.mobile || '-'}</span></div><div class="info-item"><span class="info-label">Joining Date</span><span class="info-value">${e.joiningDate || '-'}</span></div><div class="info-item"><span class="info-label">Qualification</span><span class="info-value">${e.qualification || '-'}</span></div></div><div class="card-actions"><button class="action-chip" onclick="viewEmployee('${e.id}')"><i class="fas fa-eye"></i> View</button><button class="action-chip" onclick="editEmployee('${e.id}')"><i class="fas fa-edit"></i> Edit</button><button class="action-chip" onclick="deleteEmployee('${e.id}')"><i class="fas fa-trash"></i> Delete</button><button class="action-chip" onclick="processSalary('${e.id}')"><i class="fas fa-rupee-sign"></i> Salary</button><button class="action-chip" onclick="printEmployeeID('${e.id}')"><i class="fas fa-id-card"></i> Print ID</button></div></div>`).join('');
+        document.getElementById('empList').innerHTML = html;
+    }
+    window.showAddEmployeeForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2><i class="fas fa-user-tie"></i> Add Employee</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Full Name *</label><input id="empName" class="form-control"></div>
+            <div class="form-row"><div class="form-group"><label>Department</label><select id="empDept" class="form-control"><option>Teaching</option><option>Accounts</option><option>Admin</option></select></div><div class="form-group"><label>Designation</label><input id="empDesig" class="form-control"></div></div>
+            <div class="form-row"><div class="form-group"><label>Mobile</label><input id="empMobile" class="form-control"></div><div class="form-group"><label>Email</label><input id="empEmail" class="form-control" type="email"></div></div>
+            <div class="form-row"><div class="form-group"><label>Salary</label><input id="empSalary" class="form-control" type="number"></div><div class="form-group"><label>Joining Date</label><input id="empJoining" class="form-control" type="date"></div></div>
+            <div class="form-group"><label>Qualification</label><input id="empQualification" class="form-control"></div>
+            <div class="upload-area" id="empPhotoUpload" onclick="triggerEmpPhoto()"><i class="fas fa-camera"></i> Employee Photo</div>
+            <div class="upload-area" id="empAadharUpload" onclick="triggerEmpAadhar()"><i class="fas fa-id-card"></i> Aadhar Card</div>
+            <div class="upload-area" id="empPanUpload" onclick="triggerEmpPan()"><i class="fas fa-credit-card"></i> PAN Card</div>
+            <div class="upload-area" id="empBirthUpload" onclick="triggerEmpBirth()"><i class="fas fa-calendar"></i> Birth Certificate</div>
+            <div class="upload-area" id="empEduUpload" onclick="triggerEmpEdu()"><i class="fas fa-graduation-cap"></i> Education Documents</div>
+            <div class="upload-area" id="empExpUpload" onclick="triggerEmpExp()"><i class="fas fa-briefcase"></i> Experience Documents</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveEmployeeWithDocs()">Save Employee</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.empPhoto=null; window.empAadhar=null; window.empPan=null; window.empBirth=null; window.empEdu=[]; window.empExp=[];
+        window.triggerEmpPhoto = () => attachFileUploadWithPreview('empPhotoUpload', (f)=>{ window.empPhoto=f.data; }, 'image/*');
+        window.triggerEmpAadhar = () => attachFileUploadWithPreview('empAadharUpload', (f)=>{ window.empAadhar=f.data; }, 'image/*');
+        window.triggerEmpPan = () => attachFileUploadWithPreview('empPanUpload', (f)=>{ window.empPan=f.data; }, 'image/*');
+        window.triggerEmpBirth = () => attachFileUploadWithPreview('empBirthUpload', (f)=>{ window.empBirth=f.data; }, 'image/*');
+        window.triggerEmpEdu = () => { let input=document.createElement('input'); input.type='file'; input.multiple=true; input.accept='application/pdf,.doc,.docx'; input.onchange=(e)=>{ Array.from(e.target.files).forEach(f=>{ let reader=new FileReader(); reader.onload=(ev)=>{ window.empEdu.push({name:f.name,data:ev.target.result}); document.getElementById('empEduUpload').innerHTML += `<div class="file-preview"><i class="fas fa-file"></i> ${f.name}</div>`; }; reader.readAsDataURL(f); }); }; input.click(); };
+        window.triggerEmpExp = () => { let input=document.createElement('input'); input.type='file'; input.multiple=true; input.accept='application/pdf,.doc,.docx'; input.onchange=(e)=>{ Array.from(e.target.files).forEach(f=>{ let reader=new FileReader(); reader.onload=(ev)=>{ window.empExp.push({name:f.name,data:ev.target.result}); document.getElementById('empExpUpload').innerHTML += `<div class="file-preview"><i class="fas fa-file"></i> ${f.name}</div>`; }; reader.readAsDataURL(f); }); }; input.click(); };
+        window.saveEmployeeWithDocs = function() {
+            let name = document.getElementById('empName')?.value;
+            if(!name) { showNotification('Name required','error'); return; }
+            employees.push({ id:'E'+Date.now(), photoData:window.empPhoto, aadharData:window.empAadhar, panData:window.empPan, birthData:window.empBirth, eduDocs:window.empEdu, expDocs:window.empExp, name:name, department:document.getElementById('empDept')?.value, designation:document.getElementById('empDesig')?.value, mobile:document.getElementById('empMobile')?.value, email:document.getElementById('empEmail')?.value, salary:parseInt(document.getElementById('empSalary')?.value)||0, joiningDate:document.getElementById('empJoining')?.value, qualification:document.getElementById('empQualification')?.value, status:'Active' });
+            showNotification(`Employee ${name} added with documents!`, 'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadEmployeeManagement();
+        };
+    };
+    window.viewEmployee = function(id) { let e = employees.find(e=>e.id===id); Swal.fire({ title: e.name, html: `<p><strong>Department:</strong> ${e.department}</p><p><strong>Designation:</strong> ${e.designation}</p><p><strong>Salary:</strong> ₹${e.salary}</p><p><strong>Mobile:</strong> ${e.mobile}</p><p><strong>Email:</strong> ${e.email}</p><p><strong>Joining Date:</strong> ${e.joiningDate}</p><p><strong>Qualification:</strong> ${e.qualification}</p>${e.aadharData?'<p>✅ Aadhar Card Uploaded</p>':''}${e.panData?'<p>✅ PAN Card Uploaded</p>':''}${e.birthData?'<p>✅ Birth Certificate Uploaded</p>':''}${e.eduDocs.length?'<p>✅ ${e.eduDocs.length} Education Documents</p>':''}${e.expDocs.length?'<p>✅ ${e.expDocs.length} Experience Documents</p>':''}` }); };
+    window.editEmployee = function(id) { showNotification('Edit employee','info'); };
+    window.deleteEmployee = function(id) { Swal.fire({ title: 'Delete Employee?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ employees = employees.filter(e=>e.id!==id); showNotification('Employee deleted','success'); loadEmployeeManagement(); } }); };
+    window.processSalary = function(id) { showNotification('Salary processed','success'); };
+    window.printEmployeeID = function(id) { let e = employees.find(e=>e.id===id); let printContent = `<div style="text-align:center; padding:20px; border:2px solid #000;"><h3>WINGS CONVENT</h3><img src="${e.photoData || ''}" style="width:100px;"><p><strong>${e.name}</strong></p><p>${e.department} | ${e.designation}</p><p>ID: ${e.id}</p></div>`; let win = window.open(); win.document.write(printContent); win.print(); };
+    window.filterEmployeeList = function() { renderEmployeeList(); };
+    window.clearEmployeeFilter = function() { renderEmployeeList(); };
+    
+    // ======================= MODULE 8: HOMEWORK =======================
+    function loadHomeworkManagement() {
+        let total = homework.length, pending = homework.filter(h=>h.status==='Pending').length, completed = homework.filter(h=>h.status==='Submitted').length;
+        let content = `<div class="action-buttons"><input type="text" id="hwSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterHomework()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearHomeworkFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddHomeworkForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${total}</div><div>Total Homework</div></div><div class="summary-item"><div class="summary-value">${pending}</div><div>Pending</div></div><div class="summary-item"><div class="summary-value">${completed}</div><div>Completed</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Subject-wise</h3><canvas id="subjectChart"></canvas></div></div>
+            <div id="hwList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderHomeworkList();
+        setTimeout(() => { new Chart(document.getElementById('subjectChart'), { type: 'bar', data: { labels: ['English', 'Math', 'Hindi', 'Science'], datasets: [{ label: 'Assignments', data: [5, 4, 3, 2], backgroundColor: '#8b5cf6' }] } }); }, 100);
+    }
+    function renderHomeworkList() {
+        let html = homework.map(h => `<div class="data-card"><div class="card-header"><div class="card-photo">📚</div><div class="card-title"><h3>${h.title}</h3><p>${h.subject} | ${h.class} | Due: ${h.dueDate}</p></div><span class="badge ${h.status==='Pending'?'badge-warning':'badge-success'}">${h.status}</span></div><div class="card-body"><p>${h.description || ''}</p>${h.attachData ? `<div class="file-preview"><i class="fas fa-paperclip"></i> ${h.attachName || 'Attachment'}</div>` : ''}</div><div class="card-actions"><button class="action-chip" onclick="viewHomework('${h.id}')">View</button><button class="action-chip" onclick="editHomework('${h.id}')">Edit</button><button class="action-chip" onclick="deleteHomework('${h.id}')">Delete</button><button class="action-chip" onclick="notifyHomework('${h.id}')">Notify</button></div></div>`).join('');
+        document.getElementById('hwList').innerHTML = html;
+    }
+    window.showAddHomeworkForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Homework</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Title *</label><input id="hwTitle" class="form-control"></div>
+            <div class="form-group"><label>Class</label><select id="hwClass" class="form-control"><option>Playgroup A</option><option>Playgroup B</option><option>Nursery A</option><option>Nursery B</option><option>KG-1 A</option><option>KG-1 B</option><option>KG-2 A</option><option>KG-2 B</option></select></div>
+            <div class="form-group"><label>Subject</label><input id="hwSubject" class="form-control"></div>
+            <div class="form-row"><div class="form-group"><label>Start Date</label><input id="hwStart" class="form-control" type="date" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Due Date</label><input id="hwDue" class="form-control" type="date"></div></div>
+            <div class="form-group"><label>Description</label><textarea id="hwDesc" class="form-control" rows="2"></textarea></div>
+            <div class="upload-area" id="hwFileUpload" onclick="triggerHwFile()"><i class="fas fa-paperclip"></i> Homework File / Image</div>
+            <div class="checkbox-group"><input type="checkbox" id="notifyStudents"> <label>Notify Students</label></div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveHomeworkWithFile()">Save</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.hwFile=null; window.hwName='';
+        window.triggerHwFile = () => attachFileUploadWithPreview('hwFileUpload', (f)=>{ window.hwFile=f.data; window.hwName=f.name; }, 'image/*,application/pdf,.doc,.docx');
+        window.saveHomeworkWithFile = function() {
+            let title = document.getElementById('hwTitle')?.value;
+            if(!title) { showNotification('Title required','error'); return; }
+            homework.push({ id:'H'+Date.now(), title:title, class:document.getElementById('hwClass')?.value, subject:document.getElementById('hwSubject')?.value, startDate:document.getElementById('hwStart')?.value, dueDate:document.getElementById('hwDue')?.value, description:document.getElementById('hwDesc')?.value, status:'Pending', attachData:window.hwFile, attachName:window.hwName });
+            if(document.getElementById('notifyStudents')?.checked) showNotification('Students notified!','success');
+            showNotification(`Homework "${title}" added!`, 'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadHomeworkManagement();
+        };
+    };
+    window.viewHomework = function(id) { let h = homework.find(h=>h.id===id); Swal.fire({ title: h.title, html: `<p><strong>Subject:</strong> ${h.subject}</p><p><strong>Due Date:</strong> ${h.dueDate}</p><p><strong>Description:</strong> ${h.description}</p>${h.attachData ? `<div class="file-preview"><a href="${h.attachData}" target="_blank">View Attachment</a></div>` : ''}` }); };
+    window.editHomework = function(id) { showNotification('Edit homework','info'); };
+    window.deleteHomework = function(id) { Swal.fire({ title: 'Delete Homework?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ homework = homework.filter(h=>h.id!==id); showNotification('Homework deleted','success'); loadHomeworkManagement(); } }); };
+    window.notifyHomework = function(id) { showNotification('Notification sent to students','success'); };
+    window.filterHomework = function() { renderHomeworkList(); };
+    window.clearHomeworkFilter = function() { renderHomeworkList(); };
+    
+    // ======================= MODULE 9: EXAMS =======================
+    function loadExams() {
+        let total = exams.length, active = exams.filter(e=>e.status==='Scheduled' || e.status==='Upcoming').length;
+        let content = `<div class="action-buttons"><input type="text" id="examSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterExams()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearExamsFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddExamForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${total}</div><div>Total Exams</div></div><div class="summary-item"><div class="summary-value">${active}</div><div>Active Exams</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Exam Types</h3><canvas id="examTypeChart"></canvas></div></div>
+            <div id="examList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderExamList();
+        setTimeout(() => { new Chart(document.getElementById('examTypeChart'), { type: 'pie', data: { labels: ['Term', 'Unit Test', 'Weekly'], datasets: [{ data: [1, 1, 1], backgroundColor: ['#2563eb', '#10b981', '#f59e0b'] }] } }); }, 100);
+    }
+    function renderExamList() {
+        let html = exams.map(e => `<div class="data-card"><div class="card-header"><div class="card-photo">📝</div><div class="card-title"><h3>${e.name}</h3><p>${e.type} | ${e.startDate} to ${e.endDate}</p></div><span class="badge badge-info">${e.status}</span></div><div class="card-body"><p>Subjects: ${e.subjects?.join(', ') || 'All'}</p>${e.examDoc ? `<div class="file-preview"><i class="fas fa-file"></i> Exam Document</div>` : ''}</div><div class="card-actions"><button class="action-chip" onclick="viewExam('${e.id}')">View</button><button class="action-chip" onclick="editExam('${e.id}')">Edit</button><button class="action-chip" onclick="deleteExam('${e.id}')">Delete</button><button class="action-chip" onclick="scheduleExam('${e.id}')">Schedule</button></div></div>`).join('');
+        document.getElementById('examList').innerHTML = html;
+    }
+    window.showAddExamForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Exam</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Exam Name</label><input id="examName" class="form-control"></div>
+            <div class="form-group"><label>Type</label><select id="examType" class="form-control"><option>Term</option><option>Unit Test</option><option>Weekly Test</option></select></div>
+            <div class="form-group"><label>Class</label><input id="examClass" class="form-control"></div>
+            <div class="form-row"><div class="form-group"><label>Start Date</label><input id="examStart" class="form-control" type="date"></div><div class="form-group"><label>End Date</label><input id="examEnd" class="form-control" type="date"></div></div>
+            <div class="form-group"><label>Subjects (comma separated)</label><input id="examSubjects" class="form-control" placeholder="Math, English, Science"></div>
+            <div class="upload-area" id="examDocUpload" onclick="triggerExamDoc()"><i class="fas fa-file-pdf"></i> Upload Exam Document</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveExam()">Save Exam</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.examDoc=null;
+        window.triggerExamDoc = () => attachFileUploadWithPreview('examDocUpload', (f)=>{ window.examDoc=f.data; }, 'application/pdf');
+        window.saveExam = function() {
+            let name = document.getElementById('examName')?.value;
+            if(!name) { showNotification('Exam name required','error'); return; }
+            exams.push({ id:'EX'+Date.now(), name:name, type:document.getElementById('examType')?.value, startDate:document.getElementById('examStart')?.value, endDate:document.getElementById('examEnd')?.value, status:'Scheduled', subjects:document.getElementById('examSubjects')?.value.split(','), examDoc:window.examDoc });
+            showNotification(`Exam ${name} added`,'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadExams();
+        };
+    };
+    window.viewExam = function(id) { showNotification('Exam details','info'); };
+    window.editExam = function(id) { showNotification('Edit exam','info'); };
+    window.deleteExam = function(id) { Swal.fire({ title: 'Delete Exam?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ exams = exams.filter(e=>e.id!==id); showNotification('Exam deleted','success'); loadExams(); } }); };
+    window.scheduleExam = function(id) { showNotification('Exam scheduled','success'); };
+    window.filterExams = function() { renderExamList(); };
+    window.clearExamsFilter = function() { renderExamList(); };
+    
+    // ======================= MODULE 10: RESULTS =======================
+    function loadResults() {
+        let passCount = results.filter(r=>r.percentage>=40).length;
+        let failCount = results.filter(r=>r.percentage<40).length;
+        let topper = results.sort((a,b)=>b.percentage-a.percentage)[0];
+        let content = `<div class="action-buttons"><input type="text" id="resultSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterResults()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearResultsFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddResultForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${passCount}</div><div>Pass %</div></div><div class="summary-item"><div class="summary-value">${failCount}</div><div>Fail Count</div></div><div class="summary-item"><div class="summary-value">${topper?.studentName || '-'}</div><div>Topper</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Performance Graph</h3><canvas id="performanceGraphChart"></canvas></div></div>
+            <div id="resultList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderResultList();
+        setTimeout(() => { new Chart(document.getElementById('performanceGraphChart'), { type: 'radar', data: { labels: ['Math', 'English', 'Science', 'Hindi'], datasets: [{ label: 'Marks', data: [85, 90, 78, 88], backgroundColor: 'rgba(37,99,235,0.2)', borderColor: '#2563eb' }] } }); }, 100);
+    }
+    function renderResultList() {
+        let html = results.map(r => `<div class="data-card"><div class="card-header"><div class="card-photo">🏆</div><div class="card-title"><h3>${r.studentName}</h3><p>${r.examName}</p></div><span class="badge badge-success">${r.grade}</span></div><div class="info-grid"><div class="info-item"><span class="info-label">Percentage</span><span class="info-value">${r.percentage}%</span></div><div class="info-item"><span class="info-label">Rank</span><span class="info-value">#${r.rank}</span></div></div>${r.resultAttach ? `<div class="file-preview"><i class="fas fa-file"></i> Result Attachment</div>` : ''}<div class="card-actions"><button class="action-chip" onclick="viewResult('${r.id}')">View</button><button class="action-chip" onclick="editResult('${r.id}')">Edit</button><button class="action-chip" onclick="printReportCard('${r.id}')">Print Report Card</button><button class="action-chip" onclick="downloadResult('${r.id}')">Download</button></div></div>`).join('');
+        document.getElementById('resultList').innerHTML = html;
+    }
+    window.showAddResultForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Result</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Student</label><select id="resultStudent" class="form-control">${students.map(s=>`<option value="${s.name}">${s.name}</option>`)}</select></div>
+            <div class="form-group"><label>Exam</label><select id="resultExam" class="form-control">${exams.map(e=>`<option value="${e.name}">${e.name}</option>`)}</select></div>
+            <div class="form-group"><label>Subject-wise Marks (comma separated)</label><input id="resultMarks" class="form-control" placeholder="Math:85, English:90, Science:78"></div>
+            <div class="upload-area" id="resultAttachUpload" onclick="triggerResultAttach()"><i class="fas fa-paperclip"></i> Upload Result Attachment</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveResult()">Save Result</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.resultAttach=null;
+        window.triggerResultAttach = () => attachFileUploadWithPreview('resultAttachUpload', (f)=>{ window.resultAttach=f.data; }, 'application/pdf');
+        window.saveResult = function() {
+            let student = document.getElementById('resultStudent').value;
+            let exam = document.getElementById('resultExam').value;
+            let percentage = 85.5;
+            let grade = percentage>=90?'A+':percentage>=80?'A':percentage>=70?'B':'C';
+            results.push({ id:'R'+Date.now(), studentName:student, examName:exam, marks:{}, total:0, percentage:percentage, grade:grade, rank:results.length+1, resultAttach:window.resultAttach });
+            showNotification(`Result added for ${student} (${percentage}%)`,'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadResults();
+        };
+    };
+    window.viewResult = function(id) { let r = results.find(r=>r.id===id); Swal.fire({ title: `${r.studentName} - ${r.examName}`, html: `<p><strong>Percentage:</strong> ${r.percentage}%</p><p><strong>Grade:</strong> ${r.grade}</p><p><strong>Rank:</strong> #${r.rank}</p>` }); };
+    window.editResult = function(id) { showNotification('Edit result','info'); };
+    window.printReportCard = function(id) { let r = results.find(r=>r.id===id); let printContent = `<div style="text-align:center; padding:20px;"><h2>WINGS CONVENT SCHOOL</h2><h3>Report Card</h3><p><strong>Student:</strong> ${r.studentName}</p><p><strong>Exam:</strong> ${r.examName}</p><p><strong>Percentage:</strong> ${r.percentage}%</p><p><strong>Grade:</strong> ${r.grade}</p><p><strong>Rank:</strong> #${r.rank}</p></div>`; let win = window.open(); win.document.write(printContent); win.print(); };
+    window.downloadResult = function(id) { showNotification('Result download started','info'); };
+    window.filterResults = function() { renderResultList(); };
+    window.clearResultsFilter = function() { renderResultList(); };
+    
+    // ======================= MODULE 11: LEAVE =======================
+    function loadLeaveManagement() {
+        let total = leaves.length, pending = leaves.filter(l=>l.status==='Pending').length, approved = leaves.filter(l=>l.status==='Approved').length;
+        let content = `<div class="action-buttons"><input type="text" id="leaveSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterLeaves()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearLeavesFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showApplyLeaveForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${total}</div><div>Total Leave</div></div><div class="summary-item"><div class="summary-value">${pending}</div><div>Pending</div></div><div class="summary-item"><div class="summary-value">${approved}</div><div>Approved</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Leave Types</h3><canvas id="leaveTypeChart"></canvas></div></div>
+            <div id="leaveList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderLeaveList();
+        setTimeout(() => { new Chart(document.getElementById('leaveTypeChart'), { type: 'doughnut', data: { labels: ['Sick', 'Casual', 'Earned'], datasets: [{ data: [1, 1, 1], backgroundColor: ['#ef4444', '#f59e0b', '#10b981'] }] } }); }, 100);
+    }
+    function renderLeaveList() {
+        let html = leaves.map(l => `<div class="data-card"><div class="card-header"><div class="card-photo">🌴</div><div class="card-title"><h3>${l.empName}</h3><p>${l.type} | ${l.fromDate} to ${l.toDate} (${l.days} days)</p></div><span class="badge ${l.status==='Pending'?'badge-warning':'badge-success'}">${l.status}</span></div><div class="card-body"><p>Reason: ${l.reason}</p>${l.medicalCert ? `<div class="file-preview"><i class="fas fa-file-medical"></i> Medical Certificate</div>` : ''}</div><div class="card-actions">${l.status==='Pending' ? `<button class="action-chip" onclick="approveLeave('${l.id}')">Approve</button><button class="action-chip" onclick="rejectLeave('${l.id}')">Reject</button>` : ''}<button class="action-chip" onclick="editLeave('${l.id}')">Edit</button></div></div>`).join('');
+        document.getElementById('leaveList').innerHTML = html;
+    }
+    window.showApplyLeaveForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Apply Leave</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Employee/Student</label><select id="leavePerson" class="form-control"><option>Priya Sharma</option><option>Rajesh Kumar</option>${students.map(s=>`<option>${s.name}</option>`)}</select></div>
+            <div class="form-group"><label>Leave Type</label><select id="leaveType" class="form-control"><option>Sick Leave</option><option>Casual Leave</option><option>Earned Leave</option></select></div>
+            <div class="form-row"><div class="form-group"><label>Start Date</label><input id="leaveFrom" class="form-control" type="date" onchange="calcLeaveDays()"></div><div class="form-group"><label>End Date</label><input id="leaveTo" class="form-control" type="date" onchange="calcLeaveDays()"></div></div>
+            <div class="form-group"><label>Total Days</label><input id="leaveDays" class="form-control" readonly></div>
+            <div class="form-group"><label>Reason</label><textarea id="leaveReason" class="form-control" rows="2"></textarea></div>
+            <div class="upload-area" id="medicalCertUpload" onclick="triggerMedicalCert()"><i class="fas fa-file-medical"></i> Medical Certificate (Optional)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveLeave()">Apply Leave</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.medicalCert=null;
+        window.triggerMedicalCert = () => attachFileUploadWithPreview('medicalCertUpload', (f)=>{ window.medicalCert=f.data; }, 'image/*,application/pdf');
+        window.calcLeaveDays = function() { let from=document.getElementById('leaveFrom')?.value, to=document.getElementById('leaveTo')?.value; if(from&&to){ let days=Math.ceil((new Date(to)-new Date(from))/(1000*60*60*24))+1; document.getElementById('leaveDays').value=days; } };
+        window.saveLeave = function() {
+            let person = document.getElementById('leavePerson').value;
+            let type = document.getElementById('leaveType').value;
+            let from = document.getElementById('leaveFrom').value;
+            let to = document.getElementById('leaveTo').value;
+            let days = document.getElementById('leaveDays').value;
+            let reason = document.getElementById('leaveReason').value;
+            leaves.push({ id:'L'+Date.now(), empName:person, type:type, fromDate:from, toDate:to, days:parseInt(days), status:'Pending', reason:reason, medicalCert:window.medicalCert });
+            showNotification(`Leave applied for ${person}`,'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadLeaveManagement();
+        };
+    };
+    window.approveLeave = function(id) { let l = leaves.find(l=>l.id===id); if(l) l.status='Approved'; showNotification('Leave approved','success'); loadLeaveManagement(); };
+    window.rejectLeave = function(id) { let l = leaves.find(l=>l.id===id); if(l) l.status='Rejected'; showNotification('Leave rejected','info'); loadLeaveManagement(); };
+    window.editLeave = function(id) { showNotification('Edit leave','info'); };
+    window.filterLeaves = function() { renderLeaveList(); };
+    window.clearLeavesFilter = function() { renderLeaveList(); };
+    
+    // ======================= MODULE 12: CLASSES =======================
+    function loadClassManagement() {
+        let total = classesList.length, capacityAlert = classesList.filter(c=>c.students > c.strength*0.9).length;
+        let content = `<div class="action-buttons"><input type="text" id="classSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterClasses()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearClassesFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddClassForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${total}</div><div>Total Classes</div></div><div class="summary-item"><div class="summary-value">${capacityAlert}</div><div>Capacity Alert</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Class Strength</h3><canvas id="classStrengthChart"></canvas></div></div>
+            <div class="class-cards"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderClassList();
+        setTimeout(() => { new Chart(document.getElementById('classStrengthChart'), { type: 'bar', data: { labels: classesList.map(c=>c.name), datasets: [{ label: 'Students', data: classesList.map(c=>c.students), backgroundColor: '#2563eb' }] } }); }, 100);
+    }
+    function renderClassList() {
+        let html = classesList.map(c => `<div class="class-card"><h4>${c.name}</h4><p><i class="fas fa-user"></i> ${c.teacher}</p><p><i class="fas fa-users"></i> ${c.students}/${c.strength}</p><div class="progress-container"><div class="progress-bar" style="width:${(c.students/c.strength)*100}%"></div></div><p><i class="fas fa-door-open"></i> Room ${c.room}</p>${c.classFile ? `<div class="file-preview"><i class="fas fa-file"></i> Class File</div>` : ''}<div class="card-actions"><button class="action-chip" onclick="editClass('${c.id}')">Edit</button><button class="action-chip" onclick="deleteClass('${c.id}')">Delete</button><button class="action-chip" onclick="assignTeacher('${c.id}')">Assign Teacher</button></div></div>`).join('');
+        document.querySelector('.class-cards').innerHTML = html;
+    }
+    window.showAddClassForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Class</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Class Name</label><input id="className" class="form-control"></div>
+            <div class="form-group"><label>Section</label><select id="classSection" class="form-control"><option>A</option><option>B</option></select></div>
+            <div class="form-group"><label>Class Teacher</label><select id="classTeacher" class="form-control">${employees.filter(e=>e.department==='Teaching').map(e=>`<option>${e.name}</option>`)}</select></div>
+            <div class="form-group"><label>Room No</label><input id="classRoom" class="form-control"></div>
+            <div class="form-group"><label>Strength</label><input id="classStrength" class="form-control" type="number" value="35"></div>
+            <div class="upload-area" id="classFileUpload" onclick="triggerClassFile()"><i class="fas fa-file"></i> Upload Class File (Optional)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveClass()">Save Class</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.classFile=null;
+        window.triggerClassFile = () => attachFileUploadWithPreview('classFileUpload', (f)=>{ window.classFile=f.data; }, 'application/pdf');
+        window.saveClass = function() {
+            let name = document.getElementById('className')?.value;
+            let section = document.getElementById('classSection')?.value;
+            if(!name) { showNotification('Class name required','error'); return; }
+            classesList.push({ id:'C'+Date.now(), name:name+' '+section, teacher:document.getElementById('classTeacher')?.value, students:0, strength:parseInt(document.getElementById('classStrength')?.value), room:document.getElementById('classRoom')?.value, classFile:window.classFile });
+            showNotification(`Class ${name} ${section} added`,'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadClassManagement();
+        };
+    };
+    window.editClass = function(id) { showNotification('Edit class','info'); };
+    window.deleteClass = function(id) { Swal.fire({ title: 'Delete Class?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ classesList = classesList.filter(c=>c.id!==id); showNotification('Class deleted','success'); loadClassManagement(); } }); };
+    window.assignTeacher = function(id) { showNotification('Assign teacher to class','info'); };
+    window.filterClasses = function() { renderClassList(); };
+    window.clearClassesFilter = function() { renderClassList(); };
+    
+    // ======================= MODULE 13: TIMETABLE =======================
+    function loadTimetable() {
+        let content = `<div class="action-buttons"><input type="text" id="ttSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterTimetable()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearTimetableFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddTimetableForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${timetable.length*5}</div><div>Total Schedule</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Weekly View</h3><canvas id="weeklyTimetableChart"></canvas></div></div>
+            <div class="timetable-grid"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderTimetableList();
+        setTimeout(() => { new Chart(document.getElementById('weeklyTimetableChart'), { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], datasets: [{ label: 'Periods', data: [4, 4, 4, 4, 4], backgroundColor: '#8b5cf6' }] } }); }, 100);
+    }
+    function renderTimetableList() {
+        let html = timetable.map(t => `<div class="timetable-day"><h4>${t.day}</h4>${t.periods.map(p => `<div class="period"><span>${p}</span><button class="action-chip" onclick="editPeriod('${t.day}','${p}')">Edit</button></div>`).join('')}<div class="card-actions"><button class="action-chip" onclick="editTimetableDay('${t.day}')">Edit Day</button><button class="action-chip" onclick="deleteTimetableDay('${t.day}')">Delete</button><button class="action-chip" onclick="printTimetable()">Print</button></div></div>`).join('');
+        document.querySelector('.timetable-grid').innerHTML = html;
+    }
+    window.showAddTimetableForm = function() {
+        Swal.fire({ title: 'Add Timetable Schedule', html: `<select id="ttDay" class="swal2-select"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select><input id="ttPeriod" class="swal2-input" placeholder="Period (e.g., Math - 9:00)"><input id="ttTeacher" class="swal2-input" placeholder="Teacher"><input id="ttTime" class="swal2-input" placeholder="Time Slot"><div class="upload-area" id="ttFileUpload" onclick="triggerTtFile()" style="border:1px dashed; padding:10px;">Upload Timetable File</div>`, preConfirm: () => { showNotification('Timetable updated','success'); loadTimetable(); } });
+        window.triggerTtFile = () => attachFileUploadWithPreview('ttFileUpload', (f)=>{ showNotification('Timetable file uploaded','success'); }, 'application/pdf');
+    };
+    window.editPeriod = function(day, period) { showNotification(`Edit period for ${day}`,'info'); };
+    window.editTimetableDay = function(day) { showNotification(`Edit ${day} timetable`,'info'); };
+    window.deleteTimetableDay = function(day) { timetable = timetable.filter(t=>t.day!==day); showNotification(`Timetable for ${day} deleted`,'info'); loadTimetable(); };
+    window.printTimetable = function() { window.print(); };
+    window.filterTimetable = function() { renderTimetableList(); };
+    window.clearTimetableFilter = function() { renderTimetableList(); };
+    
+    // ======================= MODULE 14: TRANSPORT =======================
+    function loadTransport() {
+        let routes = transport.length, vehicles = transport.length;
+        let content = `<div class="action-buttons"><input type="text" id="transportSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterTransport()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearTransportFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddTransportForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${routes}</div><div>Routes</div></div><div class="summary-item"><div class="summary-value">${vehicles}</div><div>Vehicles</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Route Distribution</h3><canvas id="routeChart"></canvas></div></div>
+            <div id="transportList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderTransportList();
+        setTimeout(() => { new Chart(document.getElementById('routeChart'), { type: 'pie', data: { labels: transport.map(t=>t.route), datasets: [{ data: transport.map(t=>t.students), backgroundColor: ['#2563eb', '#10b981'] }] } }); }, 100);
+    }
+    function renderTransportList() {
+        let html = transport.map(t => `<div class="data-card"><div class="card-header"><div class="card-photo">🚌</div><div class="card-title"><h3>${t.route}</h3><p>${t.vehicle}</p></div></div><div class="info-grid"><div class="info-item"><span class="info-label">Driver</span><span class="info-value">${t.driver}</span></div><div class="info-item"><span class="info-label">Students</span><span class="info-value">${t.students}</span></div><div class="info-item"><span class="info-label">Stops</span><span class="info-value">${t.stops}</span></div></div>${t.vehicleDoc ? `<div class="file-preview"><i class="fas fa-file"></i> Vehicle Document</div>` : ''}<div class="card-actions"><button class="action-chip" onclick="assignTransport('${t.id}')">Assign Students</button><button class="action-chip" onclick="editTransport('${t.id}')">Edit</button></div></div>`).join('');
+        document.getElementById('transportList').innerHTML = html;
+    }
+    window.showAddTransportForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Transport Route</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Route Name</label><input id="routeName" class="form-control"></div>
+            <div class="form-group"><label>Vehicle Number</label><input id="vehicleNo" class="form-control"></div>
+            <div class="form-group"><label>Driver Name</label><input id="driverName" class="form-control"></div>
+            <div class="form-group"><label>Stops (comma separated)</label><input id="stopsList" class="form-control" placeholder="Sec-1, Sec-2, Sec-3"></div>
+            <div class="upload-area" id="vehicleDocUpload" onclick="triggerVehicleDoc()"><i class="fas fa-file"></i> Upload Vehicle Document</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveTransport()">Add Route</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.vehicleDoc=null;
+        window.triggerVehicleDoc = () => attachFileUploadWithPreview('vehicleDocUpload', (f)=>{ window.vehicleDoc=f.data; }, 'application/pdf');
+        window.saveTransport = function() {
+            transport.push({ id:'T'+Date.now(), route:document.getElementById('routeName').value, vehicle:document.getElementById('vehicleNo').value, driver:document.getElementById('driverName').value, students:0, stops:document.getElementById('stopsList').value, status:'Active', vehicleDoc:window.vehicleDoc });
+            showNotification('Route added','success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadTransport();
+        };
+    };
+    window.assignTransport = function(id) { showNotification('Assign students to route','info'); };
+    window.editTransport = function(id) { showNotification('Edit transport','info'); };
+    window.filterTransport = function() { renderTransportList(); };
+    window.clearTransportFilter = function() { renderTransportList(); };
+    // ======================= MODULE 15: EXPENSES =======================
+    function loadExpenses() {
+        let total = expenses.reduce((s,e)=>s+e.amount,0);
+        let monthly = expenses.filter(e=>e.date.startsWith('2026-03')).reduce((s,e)=>s+e.amount,0);
+        let content = `<div class="action-buttons"><input type="text" id="expenseSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterExpenses()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearExpensesFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddExpenseForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">₹${total}</div><div>Total Expense</div></div><div class="summary-item"><div class="summary-value">₹${monthly}</div><div>Monthly Expense</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Category-wise Expenses</h3><canvas id="expenseCategoryChart"></canvas></div></div>
+            <div id="expenseList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderExpenseList();
+        setTimeout(() => { let catData = { Salary: expenses.filter(e=>e.category==='Salary').reduce((s,e)=>s+e.amount,0), Stationery: expenses.filter(e=>e.category==='Stationery').reduce((s,e)=>s+e.amount,0) }; new Chart(document.getElementById('expenseCategoryChart'), { type: 'pie', data: { labels: Object.keys(catData), datasets: [{ data: Object.values(catData), backgroundColor: ['#ef4444', '#f59e0b'] }] } }); }, 100);
+    }
+    function renderExpenseList() {
+        let html = expenses.map(e => `<div class="data-card"><div class="card-header"><div class="card-photo">💸</div><div class="card-title"><h3>${e.title}</h3><p>${e.category} | ${e.date}</p></div><span class="badge badge-success">${e.status}</span></div><div class="info-grid"><div class="info-item"><span class="info-label">Amount</span><span class="info-value">₹${e.amount}</span></div><div class="info-item"><span class="info-label">Vendor</span><span class="info-value">${e.vendor || '-'}</span></div></div>${e.billData ? `<div class="file-preview"><i class="fas fa-image"></i> Bill Image</div>` : ''}<div class="card-actions"><button class="action-chip" onclick="editExpense('${e.id}')">Edit</button><button class="action-chip" onclick="deleteExpense('${e.id}')">Delete</button><button class="action-chip" onclick="printBill('${e.id}')">Print Bill</button></div></div>`).join('');
+        document.getElementById('expenseList').innerHTML = html;
+    }
+    window.showAddExpenseForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Expense</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Title</label><input id="expTitle" class="form-control"></div>
+            <div class="form-group"><label>Amount</label><input id="expAmount" class="form-control" type="number"></div>
+            <div class="form-group"><label>Category</label><select id="expCategory" class="form-control"><option>Salary</option><option>Stationery</option><option>Utility</option><option>Maintenance</option></select></div>
+            <div class="form-group"><label>Vendor</label><input id="expVendor" class="form-control"></div>
+            <div class="form-group"><label>Date</label><input id="expDate" class="form-control" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div class="upload-area" id="billUploadArea" onclick="triggerBillUpload()"><i class="fas fa-image"></i> Upload Bill Image</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveExpense()">Add Expense</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.billData=null;
+        window.triggerBillUpload = () => attachFileUploadWithPreview('billUploadArea', (f)=>{ window.billData=f.data; }, 'image/*');
+        window.saveExpense = function() {
+            let title = document.getElementById('expTitle')?.value;
+            let amount = parseFloat(document.getElementById('expAmount')?.value);
+            if(!title || !amount) { showNotification('Title and amount required','error'); return; }
+            expenses.push({ id:'EP'+Date.now(), title:title, amount:amount, category:document.getElementById('expCategory')?.value, vendor:document.getElementById('expVendor')?.value, date:document.getElementById('expDate')?.value, status:'Paid', billData:window.billData });
+            showNotification(`Expense ${title} added!`,'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadExpenses();
+        };
+    };
+    window.editExpense = function(id) { showNotification('Edit expense','info'); };
+    window.deleteExpense = function(id) { Swal.fire({ title: 'Delete Expense?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ expenses = expenses.filter(e=>e.id!==id); showNotification('Expense deleted','success'); loadExpenses(); } }); };
+    window.printBill = function(id) { let e = expenses.find(e=>e.id===id); let printContent = `<div style="text-align:center; padding:20px;"><h2>Expense Bill</h2><p><strong>Title:</strong> ${e.title}</p><p><strong>Amount:</strong> ₹${e.amount}</p><p><strong>Date:</strong> ${e.date}</p><p><strong>Vendor:</strong> ${e.vendor}</p></div>`; let win = window.open(); win.document.write(printContent); win.print(); };
+    window.filterExpenses = function() { renderExpenseList(); };
+    window.clearExpensesFilter = function() { renderExpenseList(); };
+    
+    // ======================= MODULE 16: LEDGER =======================
+    function loadLedger() {
+        let debit = ledger.reduce((s,l)=>s+l.debit,0);
+        let credit = ledger.reduce((s,l)=>s+l.credit,0);
+        let balance = ledger[ledger.length-1]?.balance || 0;
+        let content = `<div class="action-buttons"><input type="text" id="ledgerSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterLedger()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearLedgerFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="addLedgerEntry()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">₹${debit}</div><div>Debit</div></div><div class="summary-item"><div class="summary-value">₹${credit}</div><div>Credit</div></div><div class="summary-item"><div class="summary-value">₹${balance}</div><div>Balance</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Income vs Expense</h3><canvas id="ledgerChart"></canvas></div></div>
+            <div id="ledgerList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderLedgerList();
+        setTimeout(() => { new Chart(document.getElementById('ledgerChart'), { type: 'bar', data: { labels: ['Income', 'Expense'], datasets: [{ label: 'Amount', data: [credit, debit], backgroundColor: ['#10b981', '#ef4444'] }] } }); }, 100);
+    }
+    function renderLedgerList() {
+        let html = ledger.map(l => `<div class="data-card"><div class="card-header"><div class="card-photo">📒</div><div class="card-title"><h3>${l.description}</h3><p>${l.date}</p></div></div><div class="info-grid"><div class="info-item"><span class="info-label">Debit</span><span class="info-value" style="color:var(--danger);">₹${l.debit}</span></div><div class="info-item"><span class="info-label">Credit</span><span class="info-value" style="color:var(--success);">₹${l.credit}</span></div><div class="info-item"><span class="info-label">Balance</span><span class="info-value">₹${l.balance}</span></div></div>${l.attachData ? `<div class="file-preview"><i class="fas fa-paperclip"></i> Attachment</div>` : ''}<div class="card-actions"><button class="action-chip" onclick="viewLedgerEntry('${l.id}')">View</button><button class="action-chip" onclick="exportLedger()">Export</button><button class="action-chip" onclick="printLedger()">Print</button></div></div>`).join('');
+        document.getElementById('ledgerList').innerHTML = html;
+    }
+    window.addLedgerEntry = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Ledger Entry</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Description</label><input id="ledgerDesc" class="form-control"></div>
+            <div class="form-row"><div class="form-group"><label>Debit (₹)</label><input id="ledgerDebit" class="form-control" type="number" value="0"></div><div class="form-group"><label>Credit (₹)</label><input id="ledgerCredit" class="form-control" type="number" value="0"></div></div>
+            <div class="upload-area" id="ledgerAttach" onclick="triggerLedgerAttach()"><i class="fas fa-paperclip"></i> Upload Attachment</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveLedgerEntry()">Add Entry</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.ledgerAttach=null;
+        window.triggerLedgerAttach = () => attachFileUploadWithPreview('ledgerAttach', (f)=>{ window.ledgerAttach=f.data; }, 'image/*,application/pdf');
+        window.saveLedgerEntry = function() {
+            let desc = document.getElementById('ledgerDesc')?.value;
+            let debit = parseFloat(document.getElementById('ledgerDebit').value)||0;
+            let credit = parseFloat(document.getElementById('ledgerCredit').value)||0;
+            if(!desc) { showNotification('Description required','error'); return; }
+            let lastBal = ledger[ledger.length-1]?.balance || 0;
+            let newBal = lastBal - debit + credit;
+            ledger.push({ id:'L'+Date.now(), date:new Date().toISOString().split('T')[0], description:desc, debit:debit, credit:credit, balance:newBal, attachData:window.ledgerAttach });
+            showNotification('Ledger entry added','success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadLedger();
+        };
+    };
+    window.viewLedgerEntry = function(id) { showNotification('View ledger entry','info'); };
+    window.exportLedger = function() { showNotification('Ledger exported as Excel','success'); };
+    window.printLedger = function() { window.print(); };
+    window.filterLedger = function() { renderLedgerList(); };
+    window.clearLedgerFilter = function() { renderLedgerList(); };
+    
+    // ======================= MODULE 17: EVENTS =======================
+    function loadEvents() {
+        let upcoming = events.filter(e=>e.status==='Upcoming').length;
+        let completed = events.filter(e=>e.status==='Completed').length;
+        let content = `<div class="action-buttons"><input type="text" id="eventSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterEvents()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearEventsFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showAddEventForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${upcoming}</div><div>Upcoming</div></div><div class="summary-item"><div class="summary-value">${completed}</div><div>Completed</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Event Types</h3><canvas id="eventTypeChart"></canvas></div></div>
+            <div id="eventList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderEventList();
+        setTimeout(() => { new Chart(document.getElementById('eventTypeChart'), { type: 'pie', data: { labels: ['Cultural', 'Sports', 'Academic'], datasets: [{ data: [1, 1, 1], backgroundColor: ['#f59e0b', '#10b981', '#2563eb'] }] } }); }, 100);
+    }
+    function renderEventList() {
+        let html = events.map(e => `<div class="data-card"><div class="card-header"><div class="card-photo">🎉</div><div class="card-title"><h3>${e.title}</h3><p>${e.venue} | ${e.date} ${e.time}</p></div><span class="badge badge-info">${e.status}</span></div><div class="card-body"><p>${e.description || ''}</p>${e.posterData ? `<img src="${e.posterData}" style="max-height:100px; border-radius:12px;">` : ''}</div><div class="card-actions"><button class="action-chip" onclick="editEvent('${e.id}')">Edit</button><button class="action-chip" onclick="deleteEvent('${e.id}')">Delete</button><button class="action-chip" onclick="notifyEvent('${e.id}')">Notify</button></div></div>`).join('');
+        document.getElementById('eventList').innerHTML = html;
+    }
+    window.showAddEventForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Add Event</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Event Name</label><input id="eventName" class="form-control"></div>
+            <div class="form-group"><label>Date</label><input id="eventDate" class="form-control" type="date"></div>
+            <div class="form-group"><label>Venue</label><input id="eventVenue" class="form-control"></div>
+            <div class="form-group"><label>Time</label><input id="eventTime" class="form-control" type="time"></div>
+            <div class="form-group"><label>Description</label><textarea id="eventDesc" class="form-control" rows="2"></textarea></div>
+            <div class="upload-area" id="posterUpload" onclick="triggerPosterUpload()"><i class="fas fa-image"></i> Upload Poster Image</div>
+            <div class="checkbox-group"><input type="checkbox" id="notifyEvent"> <label>Notify All Users</label></div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveEvent()">Add Event</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.posterData=null;
+        window.triggerPosterUpload = () => attachFileUploadWithPreview('posterUpload', (f)=>{ window.posterData=f.data; }, 'image/*');
+        window.saveEvent = function() {
+            let name = document.getElementById('eventName')?.value;
+            if(!name) { showNotification('Event name required','error'); return; }
+            events.push({ id:'EV'+Date.now(), title:name, date:document.getElementById('eventDate')?.value, venue:document.getElementById('eventVenue')?.value, time:document.getElementById('eventTime')?.value || '10:00 AM', description:document.getElementById('eventDesc')?.value, status:'Upcoming', posterData:window.posterData });
+            if(document.getElementById('notifyEvent')?.checked) showNotification('Event notification sent!','success');
+            showNotification(`Event ${name} added`,'success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadEvents();
+        };
+    };
+    window.editEvent = function(id) { showNotification('Edit event','info'); };
+    window.deleteEvent = function(id) { Swal.fire({ title: 'Delete Event?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ events = events.filter(e=>e.id!==id); showNotification('Event deleted','success'); loadEvents(); } }); };
+    window.notifyEvent = function(id) { showNotification('Event reminder sent','success'); };
+    window.filterEvents = function() { renderEventList(); };
+    window.clearEventsFilter = function() { renderEventList(); };
+    
+    // ======================= MODULE 18: FEEDBACK =======================
+    function loadFeedback() {
+        let total = feedbacks.length, pending = feedbacks.filter(f=>f.status==='Pending').length;
+        let content = `<div class="action-buttons"><input type="text" id="feedbackSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterFeedback()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearFeedbackFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showSubmitFeedbackForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${total}</div><div>Total Feedback</div></div><div class="summary-item"><div class="summary-value">${pending}</div><div>Pending</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Feedback Type-wise</h3><canvas id="feedbackTypeChart"></canvas></div></div>
+            <div id="feedbackList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderFeedbackList();
+        setTimeout(() => { new Chart(document.getElementById('feedbackTypeChart'), { type: 'bar', data: { labels: ['Suggestion', 'Complaint', 'Query'], datasets: [{ label: 'Count', data: [1, 1, 1], backgroundColor: '#8b5cf6' }] } }); }, 100);
+    }
+    function renderFeedbackList() {
+        let html = feedbacks.map(f => `<div class="data-card"><div class="card-header"><div class="card-photo">🗣️</div><div class="card-title"><h3>${f.subject}</h3><p>From: ${f.from} | ${f.date || 'Today'}</p></div><span class="badge ${f.status==='Pending'?'badge-warning':'badge-success'}">${f.status}</span></div><div class="card-body"><p>${f.description}</p><span class="badge badge-info">Priority: ${f.priority || 'Medium'}</span>${f.attachData ? `<div class="file-preview"><i class="fas fa-paperclip"></i> Attachment</div>` : ''}</div><div class="card-actions">${f.status==='Pending' ? `<button class="action-chip" onclick="resolveFeedback('${f.id}')">Resolve</button>` : ''}<button class="action-chip" onclick="deleteFeedback('${f.id}')">Delete</button><button class="action-chip" onclick="replyFeedback('${f.id}')">Reply</button></div></div>`).join('');
+        document.getElementById('feedbackList').innerHTML = html;
+    }
+    window.showSubmitFeedbackForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Submit Feedback</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Your Name</label><input id="fbName" class="form-control"></div>
+            <div class="form-group"><label>Feedback Type</label><select id="fbType" class="form-control"><option>Suggestion</option><option>Complaint</option><option>Query</option><option>Appreciation</option></select></div>
+            <div class="form-group"><label>Subject</label><input id="fbSubject" class="form-control"></div>
+            <div class="form-group"><label>Description</label><textarea id="fbDesc" class="form-control" rows="3"></textarea></div>
+            <div class="form-group"><label>Priority</label><select id="fbPriority" class="form-control"><option>Low</option><option>Medium</option><option>High</option></select></div>
+            <div class="upload-area" id="fbAttach" onclick="triggerFbAttach()"><i class="fas fa-paperclip"></i> Attachment (Optional)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveFeedback()">Submit Feedback</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.fbAttachData=null;
+        window.triggerFbAttach = () => attachFileUploadWithPreview('fbAttach', (f)=>{ window.fbAttachData=f.data; }, 'image/*,application/pdf');
+        window.saveFeedback = function() {
+            let name = document.getElementById('fbName')?.value;
+            if(!name) { showNotification('Name required','error'); return; }
+            feedbacks.push({ id:'FB'+Date.now(), from:name, type:document.getElementById('fbType')?.value, subject:document.getElementById('fbSubject')?.value, description:document.getElementById('fbDesc')?.value, status:'Pending', date:new Date().toISOString().split('T')[0], priority:document.getElementById('fbPriority')?.value, attachData:window.fbAttachData });
+            showNotification('Feedback submitted successfully!','success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadFeedback();
+        };
+    };
+    window.resolveFeedback = function(id) { let f = feedbacks.find(f=>f.id===id); if(f) f.status='Resolved'; showNotification('Feedback resolved','success'); loadFeedback(); };
+    window.deleteFeedback = function(id) { Swal.fire({ title: 'Delete Feedback?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ feedbacks = feedbacks.filter(f=>f.id!==id); showNotification('Feedback deleted','success'); loadFeedback(); } }); };
+    window.replyFeedback = function(id) { Swal.fire({ title: 'Reply to Feedback', html: `<textarea id="replyMsg" class="swal2-textarea" placeholder="Enter your reply..."></textarea>`, preConfirm: () => { showNotification('Reply sent!','success'); } }); };
+    window.filterFeedback = function() { renderFeedbackList(); };
+    window.clearFeedbackFilter = function() { renderFeedbackList(); };
+    
+    // ======================= MODULE 19: NOTIFICATIONS =======================
+    function loadNotificationsModule() {
+        let total = notifications.length, unread = notifications.filter(n=>!n.read).length;
+        let content = `<div class="action-buttons"><input type="text" id="notifSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterNotifications()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearNotificationsFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showSendNotificationForm()">Add</button></div>
+            <div class="summary-cards"><div class="summary-item"><div class="summary-value">${total}</div><div>Total</div></div><div class="summary-item"><div class="summary-value">${unread}</div><div>Unread</div></div></div>
+            <div class="chart-container"><div class="chart-card"><h3>Notification Type</h3><canvas id="notifTypeChart"></canvas></div></div>
+            <div id="notifList" class="cards-container"></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        renderNotificationListModule();
+        setTimeout(() => { new Chart(document.getElementById('notifTypeChart'), { type: 'doughnut', data: { labels: ['Fee', 'Event', 'General'], datasets: [{ data: [1, 1, 0], backgroundColor: ['#f59e0b', '#10b981', '#2563eb'] }] } }); }, 100);
+    }
+    function renderNotificationListModule() {
+        let html = notifications.map(n => `<div class="data-card"><div class="card-header"><div class="card-photo">🔔</div><div class="card-title"><h3>${n.title}</h3><p>Send to: ${n.sendTo} | ${n.date}</p></div><span class="badge ${!n.read?'badge-warning':'badge-success'}">${n.read?'Read':'Unread'}</span></div><div class="card-body"><p>${n.message}</p>${n.attachData ? `<div class="file-preview"><i class="fas fa-paperclip"></i> Attachment</div>` : ''}</div><div class="card-actions"><button class="action-chip" onclick="sendNotificationNow('${n.id}')">Send</button><button class="action-chip" onclick="editNotification('${n.id}')">Edit</button><button class="action-chip" onclick="deleteNotification('${n.id}')">Delete</button></div></div>`).join('');
+        document.getElementById('notifList').innerHTML = html;
+    }
+    window.showSendNotificationForm = function() {
+        let modal = document.createElement('div'); modal.className = 'modal-overlay';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>Send Notification</h2><button class="close-btn" onclick="closeModal(this)">&times;</button></div>
+            <div class="form-group"><label>Title</label><input id="notifTitle" class="form-control"></div>
+            <div class="form-group"><label>Message</label><textarea id="notifMsg" class="form-control" rows="3"></textarea></div>
+            <div class="form-group"><label>Send To</label><select id="notifSendTo" class="form-control"><option>All Students</option><option>All Staff</option><option>Specific Class</option><option>All Users</option></select></div>
+            <div class="form-group"><label>Schedule Date (Optional)</label><input id="notifSchedule" class="form-control" type="datetime-local"></div>
+            <div class="upload-area" id="notifAttach" onclick="triggerNotifAttach()"><i class="fas fa-paperclip"></i> Attachment (Optional)</div>
+            <div class="modal-actions"><button class="btn btn-primary" onclick="saveNotification()">Send Notification</button><button class="btn btn-danger" onclick="closeModal(this)">Cancel</button></div></div>`;
+        document.body.appendChild(modal);
+        window.notifAttach=null;
+        window.triggerNotifAttach = () => attachFileUploadWithPreview('notifAttach', (f)=>{ window.notifAttach=f.data; }, 'image/*,application/pdf');
+        window.saveNotification = function() {
+            let title = document.getElementById('notifTitle')?.value;
+            if(!title) { showNotification('Title required','error'); return; }
+            notifications.push({ id:'N'+Date.now(), title:title, message:document.getElementById('notifMsg')?.value, sendTo:document.getElementById('notifSendTo')?.value, status:'Sent', date:new Date().toISOString().split('T')[0], read:false, attachData:window.notifAttach });
+            showNotification('Notification sent!','success');
+            closeModal(document.querySelector('.modal-overlay'));
+            loadNotificationsModule();
+        };
+    };
+    window.sendNotificationNow = function(id) { showNotification('Notification sent!','success'); };
+    window.editNotification = function(id) { showNotification('Edit notification','info'); };
+    window.deleteNotification = function(id) { Swal.fire({ title: 'Delete Notification?', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed){ notifications = notifications.filter(n=>n.id!==id); showNotification('Notification deleted','success'); loadNotificationsModule(); } }); };
+    window.filterNotifications = function() { renderNotificationListModule(); };
+    window.clearNotificationsFilter = function() { renderNotificationListModule(); };
+    
+    // ======================= MODULE 20: SETTINGS (Full Control Panel) =======================
+    function loadSettingsModule() {
+        if(currentUser.role !== 'admin') {
+            document.getElementById('moduleContent').innerHTML = '<div class="profile-card"><h3>⛔ Access Restricted</h3><p>Settings module is only accessible to administrators.</p></div>';
+            return;
+        }
+        let content = `<div class="action-buttons"><input type="text" id="settingsSearch" class="search-box" placeholder="Search..."><button class="btn btn-primary btn-sm" onclick="filterSettings()"><i class="fas fa-search"></i> Filter</button><button class="btn btn-info btn-sm" onclick="clearSettingsFilter()">Clear</button><button class="btn btn-warning btn-sm" onclick="window.print()">Print</button><button class="btn btn-success btn-sm" onclick="refreshData()">Refresh</button><button class="btn btn-primary btn-sm" onclick="showFullSettingsForm()">Add</button></div>
+            <div style="background:linear-gradient(135deg,var(--theme-primary),var(--theme-secondary));padding:24px;border-radius:28px;color:white;margin-bottom:24px;"><h2><i class="fas fa-cog"></i> Settings Panel</h2><p>Complete System Control</p></div>
+            <div class="setting-card" onclick="showSchoolInfoSettings()"><i class="fas fa-school"></i> 🏫 School Information</div>
+            <div class="setting-card" onclick="showThemeSettings()"><i class="fas fa-palette"></i> 🎨 Theme & Appearance</div>
+            <div class="setting-card" onclick="showRoleSettings()"><i class="fas fa-users-cog"></i> 👥 Roles & Permissions</div>
+            <div class="setting-card" onclick="showSecuritySettings()"><i class="fas fa-shield-alt"></i> 🔐 Security Settings</div>
+            <div class="setting-card" onclick="showBackupSettings()"><i class="fas fa-database"></i> 💾 Backup & Restore</div>
+            <div class="chart-card"><h3>System Usage</h3><canvas id="systemUsageChart" style="height:150px;"></canvas></div>
+            <div class="action-buttons"><button class="btn btn-primary btn-sm" onclick="saveAllSettings()">Save All Settings</button><button class="btn btn-warning btn-sm" onclick="resetSettings()">Reset to Default</button><button class="btn btn-info btn-sm" onclick="backupSystem()">Backup Now</button><button class="btn btn-success btn-sm" onclick="restoreBackup()">Restore</button></div>`;
+        document.getElementById('moduleContent').innerHTML = content;
+        setTimeout(() => { new Chart(document.getElementById('systemUsageChart'), { type: 'doughnut', data: { labels: ['Storage Used', 'Storage Free'], datasets: [{ data: [23, 77], backgroundColor: ['#2563eb', '#e2e8f0'] }] } }); }, 100);
+    }
+    window.showSchoolInfoSettings = function() {
+        Swal.fire({ title: 'School Information', html: `<input id="schoolName" class="swal2-input" value="Wings Convent School"><input id="schoolAddress" class="swal2-input" value="123 Education Avenue, Delhi"><input id="schoolPhone" class="swal2-input" value="+91 9876543210"><input id="schoolEmail" class="swal2-input" value="info@wings.edu"><div class="upload-area" id="schoolLogoUpload" onclick="triggerSchoolLogo()" style="border:1px dashed; padding:10px; text-align:center;">Upload School Logo</div>`, preConfirm: () => { showNotification('School information saved!','success'); } });
+        window.triggerSchoolLogo = () => attachFileUploadWithPreview('schoolLogoUpload', (f)=>{ showNotification('Logo uploaded!','success'); }, 'image/*');
+    };
+    window.showThemeSettings = function() {
+        Swal.fire({ title: 'Theme Settings', html: `<div style="display:flex; gap:10px; flex-wrap:wrap;"><button class="btn" onclick="setTheme('blue')" style="background:#2563eb;color:white;">Blue</button><button class="btn" onclick="setTheme('green')" style="background:#10b981;color:white;">Green</button><button class="btn" onclick="setTheme('purple')" style="background:#8b5cf6;color:white;">Purple</button><button class="btn" onclick="setTheme('orange')" style="background:#f97316;color:white;">Orange</button><button class="btn" onclick="setTheme('dark')" style="background:#1f2937;color:white;">Dark</button></div><div><label><input type="checkbox" id="darkModeToggle"> Dark Mode</label></div><div class="form-group"><label>Custom Primary Color</label><input type="color" id="customColor" class="form-control" value="#2563eb"></div>`, preConfirm: () => { if(document.getElementById('darkModeToggle')?.checked) toggleTheme(); showNotification('Theme updated!','success'); } });
+    };
+    window.showRoleSettings = function() {
+        Swal.fire({ title: 'Roles & Permissions', html: `<div><label><input type="checkbox" checked> Admin - Full Access</label></div><div><label><input type="checkbox" checked> Teacher - Academic Access</label></div><div><label><input type="checkbox" checked> Student - View Only</label></div><div><label><input type="checkbox" checked> Accountant - Finance Only</label></div><div><label><input type="checkbox"> Parent - Child Tracking</label></div><div class="form-group"><label>Custom Role Name</label><input class="form-control" placeholder="New Role"></div>`, preConfirm: () => { showNotification('Role permissions updated!','success'); } });
+    };
+    window.showSecuritySettings = function() {
+        Swal.fire({ title: 'Security Settings', html: `<div class="form-group"><label>Session Timeout (minutes)</label><input id="sessionTimeout" class="form-control" value="15" type="number"></div><div class="form-group"><label>Max Login Attempts</label><input id="loginAttempts" class="form-control" value="3" type="number"></div><div class="checkbox-group"><input type="checkbox"> Two-Factor Authentication</div><div class="checkbox-group"><input type="checkbox"> IP Restriction</div><div class="checkbox-group"><input type="checkbox" checked> Enable Session Timeout</div>`, preConfirm: () => { showNotification('Security settings saved!','success'); } });
+    };
+    window.showBackupSettings = function() {
+        Swal.fire({ title: 'Backup & Restore', html: `<div class="form-group"><label>Backup Frequency</label><select class="form-control"><option>Manual</option><option>Daily</option><option>Weekly</option></select></div><div class="checkbox-group"><input type="checkbox" checked> Auto Backup Enabled</div><div style="background:var(--bg-body);padding:12px;border-radius:8px;margin:12px 0;"><p><strong>Last Backup:</strong> ${new Date().toLocaleString()}</p><p><strong>Backup Size:</strong> 156 MB</p></div><button class="btn btn-primary" onclick="backupSystem()">Backup Now</button><button class="btn btn-warning" onclick="restoreBackup()">Restore Backup</button>`, showConfirmButton: false });
+    };
+    window.showFullSettingsForm = function() { showSchoolInfoSettings(); };
+    window.saveAllSettings = function() { showNotification('All settings saved successfully!','success'); };
+    window.resetSettings = function() { Swal.fire({ title: 'Reset Settings?', text: 'This will reset all configurations to default', icon: 'warning', showCancelButton: true }).then(r=>{ if(r.isConfirmed) showNotification('Settings reset to default','success'); }); };
+    window.backupSystem = function() { showNotification('Backup created: wings_backup_'+new Date().toISOString().slice(0,10)+'.zip','success'); };
+    window.restoreBackup = function() { showNotification('Restore feature - select backup file','info'); };
+    window.filterSettings = function() { };
+    window.clearSettingsFilter = function() { };
+    window.setTheme = function(theme) { document.body.className=''; document.body.classList.add(`theme-${theme}`); localStorage.setItem('theme',theme); showNotification(`Theme changed to ${theme}`,'success'); };
+    
+    // ======================= COMMON FUNCTIONS =======================
+    function getModulesForRole(role) { return MODULES.filter(m=>m.roles.includes(role)); }
+    function renderDashboard() {
+        let allowed = getModulesForRole(currentUser.role);
+        let html = '';
+        allowed.forEach(m => { html += `<div class="module-card" onclick="openModule(${m.id})"><span class="module-icon">${m.icon}</span><div class="module-title">${m.name}</div><div class="module-badge">${m.desc}</div></div>`; });
+        document.getElementById('moduleGrid').innerHTML = html;
+    }
+    window.openModule = function(id) {
+        let mod = MODULES.find(m=>m.id===id);
+        if(!mod.roles.includes(currentUser.role)) { showNotification('Access Denied','error'); return; }
+        document.getElementById('dashboardView').style.display='none';
+        document.getElementById('moduleView').style.display='block';
+        document.getElementById('moduleTitle').innerHTML = `${mod.icon} ${mod.name}`;
+        switch(id) {
+            case 1: loadDashboard(); break;
+            case 2: loadProfile(); break;
+            case 3: loadStudentManagement(); break;
+            case 4: loadFeeCollection(); break;
+            case 5: loadAttendance(); break;
+            case 6: loadEmpAttendance(); break;
+            case 7: loadEmployeeManagement(); break;
+            case 8: loadHomeworkManagement(); break;
+            case 9: loadExams(); break;
+            case 10: loadResults(); break;
+            case 11: loadLeaveManagement(); break;
+            case 12: loadClassManagement(); break;
+            case 13: loadTimetable(); break;
+            case 14: loadTransport(); break;
+            case 15: loadExpenses(); break;
+            case 16: loadLedger(); break;
+            case 17: loadEvents(); break;
+            case 18: loadFeedback(); break;
+            case 19: loadNotificationsModule(); break;
+            case 20: loadSettingsModule(); break;
+            default: document.getElementById('moduleContent').innerHTML='<div>Module not found</div>';
+        }
+    };
+    function startDateTime() { let update=()=>{ let now=new Date(); document.getElementById('headerDateTime').innerHTML=now.toLocaleDateString()+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }; update(); setInterval(update,60000); }
+    function login() {
+        if(document.getElementById('password').value !== '1234') { showNotification('Invalid password','error'); return; }
+        let role = document.getElementById('userRole').value;
+        let name = { admin:'Administrator', teacher:'Priya Sharma', student:'Aarav Sharma', cashier:'Suresh Kumar', accountant:'Anita Sharma' }[role];
+        currentUser = { name:name, role:role, roleDisplay:role==='admin'?'Administrator':role==='teacher'?'Teacher':role==='student'?'Student':role==='cashier'?'Cashier':'Accountant' };
+        document.getElementById('headerUserName').innerHTML = currentUser.roleDisplay;
+        document.getElementById('loginScreen').classList.remove('active');
+        document.getElementById('mainScreen').classList.add('active');
+        startDateTime();
+        renderDashboard();
+        loginHistoryData.unshift({ time:new Date().toLocaleString(), ip:'192.168.1.101', device:'Chrome/Windows' });
+        showNotification(`Welcome ${currentUser.name}!`, 'success');
+    }
+    function logout() { document.getElementById('mainScreen').classList.remove('active'); document.getElementById('loginScreen').classList.add('active'); showNotification('Logged out','info'); }
+    function toggleTheme() { darkMode=!darkMode; document.body.classList.toggle('dark-mode',darkMode); localStorage.setItem('darkMode',darkMode); document.getElementById('themeToggle').innerHTML=darkMode?'☀️':'🌙'; }
+    
+    // Event Listeners
+    document.getElementById('loginBtn')?.addEventListener('click',login);
+    document.getElementById('logoutNavBtn')?.addEventListener('click',logout);
+    document.getElementById('themeToggle')?.addEventListener('click',toggleTheme);
+    document.getElementById('backToDashboardBtn')?.addEventListener('click',showDashboard);
+    document.getElementById('userProfile')?.addEventListener('click',()=>openModule(2));
+    document.getElementById('notificationIcon')?.addEventListener('click',()=>{ document.getElementById('notificationPopup').classList.toggle('show'); renderNotificationList(); });
+    document.getElementById('markAllReadBtn')?.addEventListener('click',markAllAsRead);
+    document.querySelectorAll('.nav-item[data-nav]').forEach(item=>{
+        item.addEventListener('click',function(){
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+            this.classList.add('active');
+            let nav=this.dataset.nav;
+            if(nav==='dashboard') showDashboard();
+            else if(nav==='students') openModule(3);
+            else if(nav==='fees') openModule(4);
+            else if(nav==='attendance') openModule(5);
+            else if(nav==='profile') openModule(2);
+        });
+    });
+    document.addEventListener('click',(e)=>{ if(!e.target.closest('.fab')&&!e.target.closest('.fab-menu')){ document.getElementById('fabMenu').classList.remove('show'); } });
+    
+    let savedTheme = localStorage.getItem('theme');
+    if(savedTheme) document.body.classList.add(`theme-${savedTheme}`);
+    if(localStorage.getItem('darkMode')==='true'){ darkMode=true; document.body.classList.add('dark-mode'); document.getElementById('themeToggle').innerHTML='☀️'; }
+</script>
+</body>
+</html>
